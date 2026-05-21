@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-package-lock.json
+# package-lock.json  # Uncommented for Docker builds with npm ci
 yarn.lock
 
 # Build
