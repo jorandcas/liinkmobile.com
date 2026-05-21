@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - DN Verification</title>
+  <link href="css/output.css" rel="stylesheet">
+  <style>
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .animate-fade-out {
+      animation: fadeOut 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-slate-900">DN Verification</h1>
+            <span class="text-xs text-slate-500" id="distribuidorName">Cargando...</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:block text-right">
+            <p class="text-sm font-medium text-slate-900" id="userName">Usuario</p>
+            <p class="text-xs text-slate-500">Tenant Admin</p>
+          </div>
+          <button id="logoutBtn" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            <span class="hidden sm:inline">Cerrar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+    <section class="space-y-6">
+      <!-- Page Header -->
+      <div class="flex flex-col justify-between gap-4 rounded-3xl border border-slate-200 bg-white px-6 py-5 shadow-sm md:flex-row md:items-center lg:px-8">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Centro de validación</h1>
+          <p class="mt-1 text-sm text-slate-500">
+            Consulta un número de forma individual o carga un archivo CSV para validar múltiples registros.
+          </p>
+        </div>
+
+        <!-- Environment Toggle -->
+        <div class="flex w-fit rounded-2xl bg-slate-100 p-1" id="environmentToggle">
+          <button data-env="QA" class="env-btn rounded-xl px-4 py-2 text-sm font-semibold transition text-slate-500 hover:text-slate-900">
+            QA
+          </button>
+          <button data-env="PROD" class="env-btn rounded-xl px-4 py-2 text-sm font-semibold transition bg-white text-slate-950 shadow-sm">
+            PROD
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid: Individual + Bulk -->
+      <div class="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <!-- Validación Individual -->
+        <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div class="border-b border-slate-200 bg-white px-6 py-5 md:px-8">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl bg-emerald-500 text-white">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold tracking-tight text-slate-900">Consulta individual</h2>
+                  <p class="mt-1 text-sm leading-6 text-slate-500">Valida un número específico de forma rápida y segura.</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                Rápida
+              </span>
+            </div>
+          </div>
+
+          <div class="p-6 md:p-8">
+            <label class="mb-2 block text-sm font-semibold text-slate-900">Número telefónico</label>
+            <div class="flex items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4 transition focus-within:border-emerald-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-50">
+              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                id="singlePhone"
+                type="text"
+                placeholder="Ej. 9233250673"
+                maxlength="10"
+                class="w-full bg-transparent text-base outline-none placeholder:text-slate-400"
+              >
+            </div>
+            <p class="mt-2 text-xs text-slate-500">
+              Ingresa un número a 10 dígitos para validar en el entorno seleccionado.
+            </p>
+            <p id="phoneError" class="mt-1 text-xs text-red-600 hidden">El número debe tener exactamente 10 dígitos</p>
+
+            <button
+              id="validateIndividualBtn"
+              type="button"
+              class="mt-6 h-14 w-full rounded-2xl bg-emerald-500 text-base font-bold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            >
+              Validar número
+            </button>
+
+            <!-- Resultado individual -->
+            <div id="individualResult" class="hidden mt-6 bg-slate-50 rounded-3xl p-6">
+              <h3 class="text-sm font-semibold text-slate-900 mb-3">Resultado de la Validación</h3>
+              <div id="individualResultContent"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validación Masiva -->
+        <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div class="border-b border-slate-200 bg-white px-6 py-5 md:px-8">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl bg-blue-500 text-white">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold tracking-tight text-slate-900">Consulta masiva (CSV)</h2>
+                  <p class="mt-1 text-sm leading-6 text-slate-500">Carga un archivo para validar múltiples números en un solo flujo.</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                Por archivo
+              </span>
+            </div>
+          </div>
+
+          <div class="p-6 md:p-8">
+            <!-- Advertencia procesamiento -->
+            <div class="mb-6 rounded-3xl border border-blue-100 bg-blue-50 px-5 py-4">
+              <div class="flex gap-3">
+                <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-blue-950">Procesamiento secuencial</p>
+                  <p class="mt-1 text-sm leading-6 text-blue-800">
+                    Las validaciones se procesan una por una con 5 segundos de espera entre cada consulta.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- File Upload -->
+            <div class="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <p class="text-sm font-semibold text-slate-900">Cargar archivo CSV</p>
+                <p class="mt-1 text-xs text-slate-500">Usa el formato recomendado para evitar errores.</p>
+              </div>
+              <button
+                id="downloadTemplate"
+                class="text-sm font-semibold text-emerald-700 underline-offset-4 hover:underline"
+              >
+                Descargar formato
+              </button>
+            </div>
+
+            <div class="mb-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center transition hover:border-emerald-300 hover:bg-emerald-50/30">
+              <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-white text-emerald-600 shadow-sm">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+              </div>
+
+              <!-- Estado sin archivo seleccionado -->
+              <div id="noFileSelected">
+                <p class="text-base font-semibold text-slate-900">Arrastra tu archivo aquí</p>
+                <p class="mt-1 text-sm text-slate-500">o selecciónalo desde tu computadora</p>
+                <div class="mt-5">
+                  <input
+                    type="file"
+                    id="csvFile"
+                    accept=".csv"
+                    class="hidden"
+                  >
+                  <label
+                    for="csvFile"
+                    class="inline-block cursor-pointer rounded-2xl bg-slate-900 px-6 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                  >
+                    Seleccionar archivo
+                  </label>
+                </div>
+                <p class="mt-4 text-xs text-slate-400">CSV · Máximo 10 MB</p>
+              </div>
+
+              <!-- Estado con archivo seleccionado -->
+              <div id="fileSelected" class="hidden">
+                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-100 text-emerald-600">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <p class="text-base font-semibold text-emerald-900">Archivo seleccionado</p>
+                <p id="selectedFileName" class="mt-2 text-sm font-bold text-slate-900 break-all px-4">nombre_archivo.csv</p>
+                <div class="mt-5 flex items-center justify-center gap-3">
+                  <input
+                    type="file"
+                    id="csvFileChange"
+                    accept=".csv"
+                    class="hidden"
+                  >
+                  <label
+                    for="csvFileChange"
+                    class="inline-block cursor-pointer rounded-2xl border-2 border-emerald-500 bg-white px-6 py-3 text-base font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
+                  >
+                    Cambiar archivo
+                  </label>
+                  <button
+                    id="clearFileBtn"
+                    class="inline-block rounded-2xl border-2 border-red-300 bg-white px-6 py-3 text-base font-semibold text-red-600 shadow-sm transition hover:bg-red-50"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+                <p class="mt-3 text-xs text-slate-400">Listo para validar</p>
+              </div>
+            </div>
+
+            <!-- Indicador de Carga -->
+            <div id="progressContainer" class="hidden mb-6 rounded-3xl border-2 border-emerald-200 bg-emerald-50 p-6">
+              <div class="flex items-center gap-4">
+                <!-- Spinner animado -->
+                <div class="relative">
+                  <div class="h-12 w-12 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600"></div>
+                </div>
+
+                <!-- Texto de carga -->
+                <div class="flex-1">
+                  <p class="text-lg font-bold text-emerald-900">Revisando vinculaciones...</p>
+                  <p id="progressDetail" class="mt-1 text-sm text-emerald-700">Validando números de teléfono</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div class="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                Nota: PROD requiere API Key configurada y activa.
+              </div>
+              <button
+                id="validateBulkBtn"
+                type="button"
+                class="h-14 rounded-2xl bg-emerald-500 px-8 text-base font-bold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              >
+                Validar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast de Notificación de Éxito (fuera de contenedores con overflow) -->
+      <div id="successToast" class="hidden fixed top-6 right-6 z-50 animate-slide-in">
+        <div class="flex items-center gap-3 rounded-3xl border-2 border-emerald-200 bg-emerald-50 px-6 py-4 shadow-xl">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-base font-bold text-emerald-900">¡Campaña creada con éxito!</p>
+            <p class="text-sm text-emerald-700">La validación se ha completado correctamente</p>
+          </div>
+          <button id="closeSuccessToast" class="ml-2 text-emerald-500 hover:text-emerald-700 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Historial de Campañas -->
+      <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col justify-between gap-4 border-b border-slate-200 px-6 py-5 md:flex-row md:items-center lg:px-8">
+          <div>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900">Historial de campañas</h2>
+            <p class="mt-1 text-sm text-slate-500">
+              Cada archivo CSV cargado crea una campaña para consultar resultados, estado y descargas.
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button
+              id="createTestCampaign"
+              class="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
+            >
+              Crear campaña de prueba
+            </button>
+            <div class="flex items-center gap-2 rounded-2xl bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-600" id="campaignsCount">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span id="campaignCount">0</span> campañas
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left" id="campaignsTableDesktop">
+            <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <tr>
+                <th class="px-8 py-4 font-bold">Campaña</th>
+                <th class="px-4 py-4 font-bold">Entorno</th>
+                <th class="px-4 py-4 font-bold">Estado</th>
+                <th class="px-4 py-4 font-bold">Registros</th>
+                <th class="px-4 py-4 font-bold">Resultado</th>
+                <th class="px-8 py-4 text-right font-bold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="campaignsListDesktop" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="6" class="px-8 py-8 text-center text-sm text-slate-500">
+                  No hay campañas guardadas
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile: Lista de campañas -->
+        <div id="campaignsListMobile" class="grid gap-4 p-5 md:hidden">
+          <p class="text-center text-sm text-slate-500">No hay campañas guardadas</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de Confirmación -->
+  <div id="confirmModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-xl">
+      <div class="text-center mb-6">
+        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900" id="confirmTitle">Confirmar Validación</h3>
+        <p class="mt-2 text-sm text-slate-500" id="confirmMessage">Mensaje de confirmación</p>
+      </div>
+
+      <div id="confirmDetails" class="mb-6 bg-slate-50 rounded-2xl p-4 text-sm">
+        <!-- Detalles dinámicos -->
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          id="confirmCancel"
+          type="button"
+          class="flex-1 h-12 rounded-2xl border border-slate-200 bg-white px-6 text-base font-semibold text-slate-700 hover:bg-slate-50 transition"
+        >
+          Cancelar
+        </button>
+        <button
+          id="confirmOk"
+          type="button"
+          class="flex-1 h-12 rounded-2xl bg-emerald-500 px-6 text-base font-bold text-white shadow-sm hover:bg-emerald-600 transition"
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign Detail Modal -->
+  <div id="campaignModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="modalTitle" class="text-lg font-semibold text-slate-900"></h3>
+        <button id="closeModal" class="rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 text-center shadow-xl">
+      <svg class="animate-spin h-10 w-10 mx-auto mb-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p id="loadingMessage" class="text-base font-semibold text-slate-900">Procesando...</p>
+    </div>
+  </div>
+
+  <script src="js/dashboard.js?v=9"></script>
+</body>
+</html>

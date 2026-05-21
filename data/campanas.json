@@ -1,0 +1,1360 @@
+[
+  {
+    "id": "CMP-1779239458616-1vpyqhm93",
+    "nombre": "Campaña 11",
+    "fecha": "2026-05-20T01:10:58.616Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 5,
+      "exitosos": 5,
+      "fallidos": 0,
+      "tiempoTotal": 25
+    },
+    "resultados": [
+      {
+        "telefono": "2463810550",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461158445",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2222550173",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2218187418",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2229072027",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779224730050-gkzztplx7",
+    "nombre": "Campaña 10",
+    "fecha": "2026-05-19T21:05:30.050Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 5,
+      "exitosos": 5,
+      "fallidos": 0,
+      "tiempoTotal": 25
+    },
+    "resultados": [
+      {
+        "telefono": "2463810550",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461158445",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2222550173",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2218187418",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2229072027",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779224461752-ra74krzgk",
+    "nombre": "Campaña 9",
+    "fecha": "2026-05-19T21:01:01.752Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 5,
+      "exitosos": 5,
+      "fallidos": 0,
+      "tiempoTotal": 25
+    },
+    "resultados": [
+      {
+        "telefono": "2463810550",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461158445",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2222550173",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2218187418",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2229072027",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779224294243-euvovfmi5",
+    "nombre": "Campaña 8",
+    "fecha": "2026-05-19T20:58:14.243Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 4,
+      "exitosos": 4,
+      "fallidos": 0,
+      "tiempoTotal": 20
+    },
+    "resultados": [
+      {
+        "telefono": "2411248145",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271159210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7444474013",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224016417",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779224223426-xyybkr4gh",
+    "nombre": "Campaña 7",
+    "fecha": "2026-05-19T20:57:03.426Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 4,
+      "exitosos": 4,
+      "fallidos": 0,
+      "tiempoTotal": 20
+    },
+    "resultados": [
+      {
+        "telefono": "2411248145",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271159210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7444474013",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224016417",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779223736210-ivf9uj85q",
+    "nombre": "Campaña 6",
+    "fecha": "2026-05-19T20:48:56.210Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 4,
+      "exitosos": 4,
+      "fallidos": 0,
+      "tiempoTotal": 20
+    },
+    "resultados": [
+      {
+        "telefono": "2411248145",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271159210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7444474013",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224016417",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779221184382-poujv1c32",
+    "nombre": "Campaña 5",
+    "fecha": "2026-05-19T20:06:24.382Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 4,
+      "exitosos": 4,
+      "fallidos": 0,
+      "tiempoTotal": 20
+    },
+    "resultados": [
+      {
+        "telefono": "2411248145",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271159210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7444474013",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224016417",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779220948515-mwtdkjgib",
+    "nombre": "Campaña 4",
+    "fecha": "2026-05-19T20:02:28.515Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 4,
+      "exitosos": 4,
+      "fallidos": 0,
+      "tiempoTotal": 20
+    },
+    "resultados": [
+      {
+        "telefono": "2411248145",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271159210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7444474013",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224016417",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1779220699232-yvpsl2cc1",
+    "nombre": "Campaña 3",
+    "fecha": "2026-05-19T19:58:19.232Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 4,
+      "exitosos": 4,
+      "fallidos": 0,
+      "tiempoTotal": 20
+    },
+    "resultados": [
+      {
+        "telefono": "2411248145",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271159210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7444474013",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224016417",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      }
+    ],
+    "creadoPor": "jorgeand.jc@gmail.com"
+  },
+  {
+    "id": "CMP-1778621442057-4b6khw1rg",
+    "nombre": "Campaña 2",
+    "fecha": "2026-05-12T21:30:42.057Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 149,
+      "exitosos": 149,
+      "fallidos": 0,
+      "tiempoTotal": 0
+    },
+    "resultados": [
+      {
+        "telefono": "2411248145",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271159210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7444474013",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224016417",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2231187927",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2411573723",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461370919",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2227101560",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2212126420",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2212790572",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "9513968541",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5639132324",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2215855957",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2211859391",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2215866745",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2225210628",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2211752751",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2212471383",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2216503131",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2229269819",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2213524680",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2224234434",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2217037873",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2213026647",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2218252552",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2214114662",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2228478061",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2218201191",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2441471780",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441378338",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2482689566",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2214396977",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5650162089",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2271250042",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271096295",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2741023045",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2272181867",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2218343599",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2271170963",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "9832105909",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2463116715",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461770100",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461546545",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461380042",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2462230840",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461239556",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2463300316",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461282249",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2462951901",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "5654058745",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2481259262",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2464739265",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7461081988",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2464402792",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2206914493",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "6626555466",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2202821001",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "5656461004",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461090729",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2463405319",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2463810550",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2461158445",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2222550173",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2218187418",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2229072027",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2223621354",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2431088319",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431067875",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431123139",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5558887728",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431237968",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431277535",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431216899",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431164308",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441485716",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431323800",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431102968",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431181077",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431104117",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441311307",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2464246898",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2462332275",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461064025",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2411970868",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2463594731",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2205227978",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2411682434",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2271139954",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441590429",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441170358",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441066188",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2218941733",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441472210",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441582512",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441246314",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2442341598",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441134546",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2212286933",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2207658537",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441102613",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2447852036",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7671063201",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2228179112",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2463355116",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2216076112",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2434350055",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431316550",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2751100380",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2431123850",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461395447",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2463359429",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461041546",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461302237",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2462074316",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2462959798",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2461217450",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5660213464",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5660439043",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2382746354",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441013383",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2432249238",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2207779039",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441219600",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5512922364",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "7531732642",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2431154699",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2382086743",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5530327542",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2451222170",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2384119004",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2213639036",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2381703641",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2381698487",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2213413135",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2382031881",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2381692702",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "7351236267",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2751049845",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441573833",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441052626",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2203529061",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2215204258",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441230476",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2441877845",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2441293731",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "2441216036",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2447863743",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2225112291",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      },
+      {
+        "telefono": "2441001779",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": false
+      }
+    ],
+    "creadoPor": "admin@movistar.com"
+  },
+  {
+    "id": "CMP-1778200218916-89no3q566",
+    "nombre": "Campaña 1",
+    "fecha": "2026-05-08T00:30:18.916Z",
+    "tipo": "multiple",
+    "entorno": "PROD",
+    "estadisticas": {
+      "totalProcesados": 9,
+      "exitosos": 9,
+      "fallidos": 0,
+      "tiempoTotal": 0
+    },
+    "resultados": [
+      {
+        "telefono": "5561704793",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5586692935",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5643493042",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5515646566",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5643220383",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5643108166",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5548796961",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5642524845",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      },
+      {
+        "telefono": "5632922560",
+        "entorno": "PROD",
+        "exito": true,
+        "vinculado": true
+      }
+    ],
+    "creadoPor": "admin@movistar.com"
+  }
+]

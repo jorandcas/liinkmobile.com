@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - DN Verification</title>
+  <link href="css/output.css" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <div class="bg-white rounded-lg shadow-sm p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-semibold text-gray-900 mb-2">DN Verification</h1>
+        <p class="text-sm text-gray-500">Sistema de Validación de Distribuidores</p>
+      </div>
+
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="ejemplo@movistar.com"
+            required
+            autocomplete="email"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors"
+          >
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors"
+          >
+        </div>
+
+        <div id="error" class="hidden bg-red-50 text-red-700 px-3 py-2 rounded text-sm"></div>
+
+        <button
+          type="submit"
+          class="w-full bg-gray-900 text-white py-2.5 rounded-md text-sm font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span class="btn-text">Iniciar Sesión</span>
+          <span class="btn-loader hidden">
+            <svg class="animate-spin h-4 w-4 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </span>
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-6">© 2026 DN Verification - Sistema Multitenant</p>
+  </div>
+
+  <script src="js/login.js?v=2"></script>
+</body>
+</html>

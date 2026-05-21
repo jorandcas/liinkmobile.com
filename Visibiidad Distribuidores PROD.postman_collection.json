@@ -1,0 +1,105 @@
+{
+  "info": {
+    "_postman_id": "0b6092aa-6830-4961-9c67-1bc8c9a67324",
+    "name": "Visibiidad Distribuidores",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "7475786"
+  },
+  "item": [
+    {
+      "name": "Validacion QA",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "ConsumerName",
+            "value": "Movistar",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://94.74.74.161:8002/api/v1//distribuidores/enrolamiento/9243250673",
+          "protocol": "http",
+          "host": [
+            "94",
+            "74",
+            "74",
+            "161"
+          ],
+          "port": "8002",
+          "path": [
+            "api",
+            "v1",
+            "",
+            "distribuidores",
+            "enrolamiento",
+            "9243250673"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Validacion PROD",
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "value",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "key",
+              "value": "x-api-key",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "ConsumerName",
+            "value": "Movistar",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://94.74.77.50:8010/api/v1/distribuidores/enrolamiento/9233250673",
+          "protocol": "http",
+          "host": [
+            "94",
+            "74",
+            "77",
+            "50"
+          ],
+          "port": "8010",
+          "path": [
+            "api",
+            "v1",
+            "distribuidores",
+            "enrolamiento",
+            "9233250673"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
