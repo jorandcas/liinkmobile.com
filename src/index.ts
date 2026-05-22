@@ -36,6 +36,15 @@ function createApp(): Application {
     next();
   });
 
+  // Health check endpoint
+  app.get('/api/health', (_, res) => {
+    res.json({
+      exito: true,
+      mensaje: 'API DN Verification funcionando correctamente',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Rutas
   app.use('/api/auth', createAuthRouter());
   app.use('/api/superadmin', createSuperAdminRouter());
