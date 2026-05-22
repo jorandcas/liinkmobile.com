@@ -18,7 +18,7 @@ const pool = new Pool({
 /**
  * Generar un token JWT
  */
-export function generateToken(userId: number, email: string, role: string): string {
+export function generateToken(userId: number, email: string, role: string, nombre?: string): string {
   const jwtSecret = process.env.JWT_SECRET;
   const jwtExpiration = process.env.JWT_EXPIRATION || '24h';
 
@@ -26,11 +26,16 @@ export function generateToken(userId: number, email: string, role: string): stri
     throw new Error('JWT_SECRET no está configurado en variables de entorno');
   }
 
-  const payload = {
+  const payload: any = {
     userId,
     email,
     role
   };
+
+  // Agregar nombre si está disponible
+  if (nombre) {
+    payload.nombre = nombre;
+  }
 
   return jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiration } as jwt.SignOptions);
 }
@@ -161,7 +166,7 @@ export async function login(
     );
 
     // Generar token
-    const token = generateToken(user.id, user.email, user.role);
+    const token = generateToken(user.id, user.email, user.role, user.nombre);
 
     // Retornar usuario sin el hash de contraseña
     const { password_hash, ...userWithoutPassword } = user;

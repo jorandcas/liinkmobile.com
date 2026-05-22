@@ -10,13 +10,32 @@ export function createConfigRouter(): Router {
   /**
    * GET /api/config
    * Obtiene la configuración del sistema
+   * Ahora usa el nombre del tenant desde el JWT
    */
-  router.get('/', (_req, res) => {
+  router.get('/', (req: any, res) => {
     try {
-      const config = obtenerConfiguracion();
+      const user = req.user;
+
+      // Usar el nombre del tenant desde el JWT, o fallback a config del entorno
+      let distribuidor = 'No configurado';
+
+      if (user?.nombre) {
+        // Capitalizar primera letra
+        distribuidor = user.nombre.charAt(0).toUpperCase() + user.nombre.slice(1);
+      } else {
+        // Fallback al método anterior (para SuperAdmin o desarrollo)
+        const config = obtenerConfiguracion();
+        distribuidor = config.distribuidor;
+      }
+
       res.json({
         exito: true,
-        config
+        config: {
+          distribuidor,
+          ambiente: process.env.NODE_ENV || 'development',
+          hasApiKeyQA: !!process.env.API_KEY_QA,
+          hasApiKeyPROD: !!process.env.API_KEY_PROD
+        }
       });
     } catch (error) {
       console.error('[Config] Error al obtener configuración:', error);
