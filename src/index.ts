@@ -7,6 +7,7 @@ import { createAuthRouter } from './routes/auth.routes';
 import { createSuperAdminRouter } from './routes/superadmin.routes';
 import { createCampanaRouter } from './routes/campana.routes';
 import { createConfigRouter } from './routes/config.routes';
+import { authMiddleware } from './middleware/auth.middleware';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -53,7 +54,7 @@ function createApp(): Application {
   app.use('/api/auth', createAuthRouter());
   app.use('/api/superadmin', createSuperAdminRouter());
   app.use('/api/campanas', createCampanaRouter());
-  app.use('/api/config', createConfigRouter());
+  app.use('/api/config', authMiddleware, createConfigRouter());
   app.use('/api', createDistribuidorRouter());
 
   // Ruta de bienvenida - Landing page
