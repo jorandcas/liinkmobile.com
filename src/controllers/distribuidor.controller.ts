@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { DistribuidorService } from '../services/distribuidor.service';
 import { getTenantDatabaseConfig, getTenantApiKey } from '../services/tenant.service';
-import { ApiResponse, ValidacionIndividualRequest, ApiError } from '../types/distribuidor.types';
+import { ApiResponse } from '../types/distribuidor.types';
 import { z } from 'zod';
 
 /**
@@ -240,7 +240,7 @@ export class DistribuidorController {
     console.error('[DistribuidorController] Error:', error);
 
     if (error instanceof z.ZodError) {
-      const errores: ApiError[] = error.errors.map(err => ({
+      const errores = error.errors.map(err => ({
         campo: err.path.join('.'),
         mensaje: err.message
       }));

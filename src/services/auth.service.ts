@@ -32,7 +32,7 @@ export function generateToken(userId: number, email: string, role: string): stri
     role
   };
 
-  return jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiration });
+  return jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiration } as jwt.SignOptions);
 }
 
 /**
@@ -59,7 +59,7 @@ export function verifyToken(token: string): any {
 export async function login(
   email: string,
   password: string,
-  ipAddress?: string
+  _ipAddress?: string
 ): Promise<{
   success: boolean;
   token?: string;

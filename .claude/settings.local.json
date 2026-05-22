@@ -19,7 +19,12 @@
       "Bash(psql:*)",
       "Bash(git init:*)",
       "Bash(git add:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add origin:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

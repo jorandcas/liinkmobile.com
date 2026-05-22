@@ -86,7 +86,7 @@ export class SuperAdminController {
   /**
    * Listar todos los tenants
    */
-  static async listTenants(req: Request, res: Response): Promise<void> {
+  static async listTenants(_req: Request, res: Response): Promise<void> {
     try {
       const result = await getAllTenants();
 
@@ -256,7 +256,7 @@ export class SuperAdminController {
   /**
    * Obtener estadísticas de auditoría
    */
-  static async getAuditStats(req: Request, res: Response): Promise<void> {
+  static async getAuditStats(_req: Request, res: Response): Promise<void> {
     try {
       const result = await getAuditStats();
 

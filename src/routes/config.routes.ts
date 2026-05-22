@@ -11,7 +11,7 @@ export function createConfigRouter(): Router {
    * GET /api/config
    * Obtiene la configuración del sistema
    */
-  router.get('/', (req, res) => {
+  router.get('/', (_req, res) => {
     try {
       const config = obtenerConfiguracion();
       res.json({

@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { Pool, PoolClient } from 'pg';
+import { Pool } from 'pg';
 import axios from 'axios';
 import { encryptApiKey, decryptApiKey } from '../utils/encryption.util';
 import { logAction } from './audit.service';
@@ -561,7 +561,7 @@ export async function getTenantDatabaseConfig(tenantId: number): Promise<{
         host: process.env.DB_HOST || 'localhost',
         port: parseInt(process.env.DB_PORT || '5432'),
         user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD,
+        password: process.env.DB_PASSWORD || '',
         database: bdName
       }
     };

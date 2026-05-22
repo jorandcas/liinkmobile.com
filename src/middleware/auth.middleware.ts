@@ -144,7 +144,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
  * Middleware opcional de autenticación
  * No rechaza la petición si no hay token, pero agrega el usuario si existe
  */
-export async function optionalAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function optionalAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
     const authHeader = req.headers.authorization;
 

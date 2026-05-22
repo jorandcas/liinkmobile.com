@@ -145,7 +145,7 @@ export class CampanaController {
   /**
    * Crear campaña de prueba
    */
-  static async crearPrueba(req: Request, res: Response): Promise<void> {
+  static async crearPrueba(_req: Request, res: Response): Promise<void> {
     try {
       const campana = await CampanaService.crearCampanaPrueba();
 
@@ -166,7 +166,7 @@ export class CampanaController {
   /**
    * Obtener siguiente número de campaña
    */
-  static async obtenerSiguienteNumero(req: Request, res: Response): Promise<void> {
+  static async obtenerSiguienteNumero(_req: Request, res: Response): Promise<void> {
     try {
       const numero = await CampanaService.obtenerSiguienteNumero();
 

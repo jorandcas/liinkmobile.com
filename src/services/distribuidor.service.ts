@@ -1,7 +1,6 @@
 import { ApiClient } from '../client/api-client';
 import { getEndpointByEnvironment } from '../config/endpoints.config';
 import { Pool } from 'pg';
-import { getTenantApiKey } from './tenant.service';
 import {
   ResultadoValidacion,
   ResultadoValidacionMasiva,
@@ -126,7 +125,7 @@ export class DistribuidorService {
   async validarLote(
     telefonos: string[],
     ambientes: ('QA' | 'PROD')[],
-    maxConcurrent?: number,
+    _maxConcurrent?: number,
     onProgress?: (procesados: number, total: number) => void
   ): Promise<ResultadoValidacion[]> {
     // Ignoramos maxConcurrent y hacemos todo secuencialmente
