@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 
 const pool = new Pool({
-  host: 'localhost',
+  host: 'postgres',
   port: 5432,
   user: 'postgres',
   password: process.env.DB_PASSWORD,
