@@ -289,15 +289,20 @@ DB_NAME=dn_verification_db
 # ============================================
 # CIFRADO DE API KEYS - GENERAR NUEVA
 # ============================================
-# Genera una nueva clave para producción:
+# IMPORTANTE: Genera una NUEVA clave para producción
+# En tu terminal local ejecuta:
 # node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
-ENCRYPTION_KEY=TU_NUEVA_CLAVE_BASE64_44_CARACTERES
+# Copia el resultado (44 caracteres base64) abajo:
+ENCRYPTION_KEY=GENERAR_NUEVA_CLAVE_AQUI_EJECUTANDO_EL_COMANDO_DE_ARRIBA
 
 # ============================================
 # JWT - GENERAR NUEVO SECRETO
 # ============================================
-# Genera un secreto muy largo y seguro (mínimo 64 caracteres)
-JWT_SECRET=TU_NUEVO_JWT_SECRET_MUY_LARGO_Y_SEGURO_MINIMO_64_CARACTERES
+# IMPORTANTE: Genera un NUEVO secreto muy largo y seguro
+# En tu terminal local ejecuta:
+# node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+# Copia el resultado (88 caracteres base64) abajo:
+JWT_SECRET=GENERAR_NUEVO_SECRETO_AQUI_EJECUTANDO_EL_COMANDO_DE_ARRIBA
 JWT_EXPIRATION=24h
 
 # ============================================
