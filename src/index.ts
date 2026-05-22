@@ -27,8 +27,12 @@ function createApp(): Application {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // Servir archivos estáticos
-  app.use(express.static(path.join(__dirname, '..', 'public')));
-  app.use(express.static(path.join(__dirname, '..', 'page')));
+  // Usar process.cwd() para compatibilidad con Coolify y entornos de producción
+  const publicPath = process.env.NODE_ENV === 'production'
+    ? path.join(process.cwd(), 'public')
+    : path.join(__dirname, '..', 'public');
+
+  app.use(express.static(publicPath));
 
   // Logging de requests
   app.use((req, _res, next) => {
@@ -54,7 +58,7 @@ function createApp(): Application {
 
   // Ruta de bienvenida - Landing page
   app.get('/', (_, res) => {
-    res.sendFile(path.join(__dirname, '..', 'page', 'index.html'));
+    res.sendFile(path.join(publicPath, 'index.html'));
   });
 
   // Redirigir /login y /dashboard a sus respectivas páginas
