@@ -4,6 +4,7 @@
  */
 
 // DOM Elements - Header
+const tenantTitle = document.getElementById('tenantTitle');
 const distribuidorName = document.getElementById('distribuidorName');
 const userName = document.getElementById('userName');
 const logoutBtn = document.getElementById('logoutBtn');
@@ -170,6 +171,7 @@ function loadDistribuidorConfig() {
       console.log('[Dashboard] Config data:', data);
       if (data.exito && data.config) {
         console.log('[Dashboard] Distribuidor encontrado:', data.config.distribuidor);
+        tenantTitle.textContent = data.config.distribuidor;
         distribuidorName.textContent = data.config.distribuidor;
       } else {
         console.log('[Dashboard] No hay config válida');

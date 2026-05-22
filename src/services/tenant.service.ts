@@ -263,7 +263,7 @@ export async function createTenant(
           'valida',
           'tenant_admin', // role: tenant_admin
           'activo', // tenant_status: activo
-          true // Debe cambiar contraseña al primer login
+          false // NO debe cambiar contraseña al primer login
         ]
       );
     } catch (error) {
