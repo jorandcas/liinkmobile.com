@@ -53,7 +53,10 @@ async function create() {
 
     client.release();
   } catch (err) {
-    console.error('❌ Error:', err.message);
+    console.error('❌ Error completo:', err);
+    console.error('Mensaje:', err?.message || 'Sin mensaje');
+    console.error('Código:', err?.code);
+    if (err?.stack) console.error('Stack:', err.stack);
   } finally {
     await pool.end();
   }
