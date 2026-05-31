@@ -1297,6 +1297,24 @@ function renderCampaignMobileCard(campana) {
         <button onclick="downloadCampaignCSVById('${campana.id}')" class="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
           Descargar
         </button>
+        <button onclick="reconsultarCampaign('${campana.id}')" class="flex-1 rounded-2xl border border-emerald-500 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition">
+          Actualizar
+        </button>
+      </div>
+      <div id="updating-${campana.id}" class="hidden mt-3">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+          <div class="flex items-center gap-2 mb-2">
+            <svg class="h-4 w-4 animate-spin text-emerald-600" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-sm font-semibold text-emerald-800" id="status-${campana.id}">Actualizando...</span>
+          </div>
+          <div class="h-2 rounded-full bg-emerald-200 mb-2">
+            <div class="h-2 rounded-full bg-emerald-500 transition-all duration-300" id="progress-${campana.id}" style="width: 0%"></div>
+          </div>
+          <p class="text-xs text-emerald-600" id="progress-text-${campana.id}">Preparando...</p>
+        </div>
       </div>
     </div>
   `;
@@ -1340,6 +1358,75 @@ window.viewCampaign = async function(id) {
   } catch (error) {
     console.error('Error:', error);
     alert('Error de conexión');
+  }
+};
+
+/**
+ * Reconsultar DN fallidos de una campaña
+ */
+window.reconsultarCampaign = async function(id) {
+  try {
+    // Mostrar UI de progreso
+    const updatingDiv = document.getElementById(`updating-${id}`);
+    const progressBar = document.getElementById(`progress-${id}`);
+    const progressText = document.getElementById(`progress-text-${id}`);
+    const statusText = document.getElementById(`status-${id}`);
+
+    if (updatingDiv) updatingDiv.classList.remove('hidden');
+
+    // Conectar SSE (token como parámetro porque EventSource no soporta headers)
+    const eventSource = new EventSource(`/api/campanas/${id}/reconsultar-fallidos?token=${authToken}`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'start') {
+        if (statusText) statusText.textContent = `Actualizando ${data.total} DN...`;
+        if (progressText) {
+          const minutos = Math.ceil(data.tiempoEstimado / 60);
+          progressText.textContent = `Tiempo estimado: ${minutos} minuto${minutos !== 1 ? 's' : ''}`;
+        }
+      }
+
+      if (data.type === 'progress') {
+        if (progressBar) progressBar.style.width = `${data.porcentaje}%`;
+        if (progressText) progressText.textContent = `Procesando ${data.procesados} de ${data.total} DN...`;
+        if (statusText) statusText.textContent = `${data.porcentaje}% completado`;
+      }
+
+      if (data.type === 'complete') {
+        eventSource.close();
+
+        if (statusText) statusText.textContent = '¡Actualizado correctamente!';
+        if (progressText) progressText.textContent = 'Reconsulta completada';
+
+        // Ocultar UI después de 2 segundos
+        setTimeout(() => {
+          if (updatingDiv) updatingDiv.classList.add('hidden');
+          // Recargar campañas
+          loadCampaigns();
+        }, 2000);
+      }
+
+      if (data.type === 'error') {
+        eventSource.close();
+        alert(data.mensaje || 'Error al reconsultar DN');
+        if (updatingDiv) updatingDiv.classList.add('hidden');
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('SSE Error:', error);
+      eventSource.close();
+      alert('Error de conexión al reconsultar DN');
+      if (updatingDiv) updatingDiv.classList.add('hidden');
+    };
+
+    // Guardar referencia para poder cerrar si es necesario
+    window[`eventSource-${id}`] = eventSource;
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error al iniciar reconsulta');
   }
 };
 

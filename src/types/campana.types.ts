@@ -6,6 +6,7 @@ export interface Campana {
   id: string;
   nombre: string;
   fecha: Date;
+  ultima_actualizacion: Date; // Fecha de última actualización (creación o re-consulta)
   tipo: 'individual' | 'multiple';
   entorno: 'QA' | 'PROD' | 'AMBOS';
   estadisticas: {
@@ -24,6 +25,8 @@ export interface ResultadoCampana {
   exito: boolean;
   vinculado: boolean;
   mensaje?: string;
+  ultima_consulta?: Date; // Cuándo se consultó este teléfono por última vez
+  actualizado_en_revision?: boolean; // Si se actualizó en la última re-consulta
 }
 
 export interface CrearCampanaRequest {

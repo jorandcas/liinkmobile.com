@@ -182,4 +182,129 @@ export class CampanaController {
       });
     }
   }
+
+  /**
+   * Reconsultar DN fallidos de una campaña (con SSE)
+   */
+  static async reconsultarFallidos(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { token } = req.query;
+
+      // Verificar token (para SSE no podemos usar header, viene como query param)
+      if (!token || typeof token !== 'string') {
+        res.status(401).json({
+          exito: false,
+          mensaje: 'Token no proporcionado'
+        });
+        return;
+      }
+
+      // Verificar token y obtener tenantId
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as any;
+      const tenantId = decoded.tenantId;
+
+      if (!tenantId) {
+        res.write(`data: ${JSON.stringify({
+          type: 'error',
+          mensaje: 'No autorizado'
+        })}\n\n`);
+        res.end();
+        return;
+      }
+
+      // Configurar headers para SSE
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      // Verificar si hay otra campaña actualizándose
+      const campaignUpdating = CampanaService.getCampaignUpdating();
+      if (campaignUpdating) {
+        res.write(`data: ${JSON.stringify({
+          type: 'error',
+          mensaje: `Ya hay una campaña actualizándose. Por favor espera a que termine.`
+        })}\n\n`);
+        res.end();
+        return;
+      }
+
+      // Obtener campaña para contar fallidos
+      const campana = await CampanaService.obtenerPorId(id);
+      if (!campana) {
+        res.write(`data: ${JSON.stringify({
+          type: 'error',
+          mensaje: 'Campaña no encontrada'
+        })}\n\n`);
+        res.end();
+        return;
+      }
+
+      // Contar DN fallidos
+      const fallidos = campana.resultados.filter(r => !r.exito || !r.vinculado);
+      const total = fallidos.length;
+
+      if (total === 0) {
+        res.write(`data: ${JSON.stringify({
+          type: 'error',
+          mensaje: 'No hay DN fallidos para reconsultar'
+        })}\n\n`);
+        res.end();
+        return;
+      }
+
+      // Enviar evento de inicio con tiempo estimado
+      const tiempoEstimado = total * 5; // 5 segundos por DN
+      res.write(`data: ${JSON.stringify({
+        type: 'start',
+        total,
+        tiempoEstimado,
+        mensaje: `Reconsultando ${total} DN fallidos...`
+      })}\n\n`);
+
+      // Ejecutar re-consulta con callback de progreso
+      try {
+        const campanaActualizada = await CampanaService.reconsultarFallidos(
+          id,
+          tenantId,
+          (procesados, total) => {
+            // Enviar progreso
+            const porcentaje = Math.round((procesados / total) * 100);
+            res.write(`data: ${JSON.stringify({
+              type: 'progress',
+              procesados,
+              total,
+              porcentaje,
+              mensaje: `Procesando ${procesados} de ${total} DN...`
+            })}\n\n`);
+          }
+        );
+
+        // Enviar evento de completado
+        res.write(`data: ${JSON.stringify({
+          type: 'complete',
+          campana: campanaActualizada,
+          mensaje: 'Reconsulta completada exitosamente'
+        })}\n\n`);
+
+        res.end();
+      } catch (error: any) {
+        console.error('[CampanaController] Error en reconsulta:', error);
+        res.write(`data: ${JSON.stringify({
+          type: 'error',
+          mensaje: error.message || 'Error al reconsultar DN'
+        })}\n\n`);
+        res.end();
+      }
+    } catch (error) {
+      console.error('[CampanaController] Error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          exito: false,
+          mensaje: 'Error al reconsultar DN fallidos'
+        });
+      }
+    }
+  }
 }

@@ -28,7 +28,8 @@
       "Bash(cat:*)",
       "Bash(npm uninstall:*)",
       "Bash(move:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git tag:*)"
     ]
   }
 }

@@ -50,5 +50,12 @@ export function createCampanaRouter(): Router {
    */
   router.delete('/:id', authMiddleware, (req, res) => CampanaController.eliminar(req, res));
 
+  /**
+   * @route   POST /api/campanas/:id/reconsultar-fallidos
+   * @desc    Reconsultar DN fallidos de una campaña
+   * @access  Private
+   */
+  router.post('/:id/reconsultar-fallidos', authMiddleware, (req, res) => CampanaController.reconsultarFallidos(req, res));
+
   return router;
 }
