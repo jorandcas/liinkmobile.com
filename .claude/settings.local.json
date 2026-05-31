@@ -27,7 +27,8 @@
       "Bash(npm run build:*)",
       "Bash(cat:*)",
       "Bash(npm uninstall:*)",
-      "Bash(move:*)"
+      "Bash(move:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
