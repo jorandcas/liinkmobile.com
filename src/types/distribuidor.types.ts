@@ -1,14 +1,12 @@
 /**
- * Respuesta del endpoint de distribuidores
+ * Respuesta del endpoint de distribuidores (API de Movistar)
+ * Formato real: { success: true, data: { dn: "...", enrolado: true|false } }
  */
 export interface DistribuidorResponse {
-  telefono: string;
-  estado: string;
-  fechaRegistro?: string;
-  distribuidor?: {
-    id: string;
-    nombre: string;
-    codigo: string;
+  success: boolean;
+  data: {
+    dn: string;
+    enrolado: boolean;
   };
   metadata?: {
     timestamp: string;
@@ -59,8 +57,11 @@ export interface ResultadoValidacion {
  */
 export interface ResultadoValidacionMasiva {
   totalProcesados: number;
-  exitosos: number;
-  fallidos: number;
+  exitosos: number; // Por compatibilidad, = vinculados
+  fallidos: number; // Por compatibilidad, = noVinculados + erroresCount
+  vinculados?: number; // DN con enrolado: true
+  noVinculados?: number; // DN con enrolado: false (API funcionó)
+  erroresCount?: number; // DN con error de API
   resultados: ResultadoValidacion[];
   errores: string[];
 }

@@ -189,26 +189,12 @@ export class CampanaController {
   static async reconsultarFallidos(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { token } = req.query;
-
-      // Verificar token (para SSE no podemos usar header, viene como query param)
-      if (!token || typeof token !== 'string') {
-        res.status(401).json({
-          exito: false,
-          mensaje: 'Token no proporcionado'
-        });
-        return;
-      }
-
-      // Verificar token y obtener tenantId
-      const jwt = require('jsonwebtoken');
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as any;
-      const tenantId = decoded.tenantId;
+      const tenantId = (req as any).user?.tenant_id;
 
       if (!tenantId) {
         res.write(`data: ${JSON.stringify({
           type: 'error',
-          mensaje: 'No autorizado'
+          mensaje: 'No autorizado - Usuario sin tenant_id'
         })}\n\n`);
         res.end();
         return;
@@ -256,6 +242,7 @@ export class CampanaController {
 
       // Enviar evento de inicio con tiempo estimado
       const tiempoEstimado = total * 5; // 5 segundos por DN
+      console.log('[CampanaController] Enviando evento START - Total:', total, 'Tiempo estimado:', tiempoEstimado);
       res.write(`data: ${JSON.stringify({
         type: 'start',
         total,
@@ -265,12 +252,14 @@ export class CampanaController {
 
       // Ejecutar re-consulta con callback de progreso
       try {
+        console.log('[CampanaController] Iniciando re-consulta...');
         const campanaActualizada = await CampanaService.reconsultarFallidos(
           id,
           tenantId,
           (procesados, total) => {
             // Enviar progreso
             const porcentaje = Math.round((procesados / total) * 100);
+            console.log(`[CampanaController] Progreso: ${procesados}/${total} (${porcentaje}%)`);
             res.write(`data: ${JSON.stringify({
               type: 'progress',
               procesados,

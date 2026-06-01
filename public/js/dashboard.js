@@ -491,10 +491,10 @@ function showIndividualResult(data) {
     let html = '<div class="space-y-3">';
 
     data.datos.forEach(resultado => {
-      // Usar exitoso (con acento) como viene del servidor
-      const esExitoso = resultado.exitoso === true;
-      const bgColor = esExitoso ? 'bg-green-50' : 'bg-red-50';
-      const statusColor = esExitoso ? 'text-green-700' : 'text-red-700';
+      // Estado API: Exitosa si la API respondió (tiene datos), Fallida si hubo error
+      const apiFunciono = resultado.datos !== undefined;
+      const bgColor = apiFunciono ? 'bg-green-50' : 'bg-red-50';
+      const statusColor = apiFunciono ? 'text-green-700' : 'text-red-700';
       const entorno = resultado.origen || 'N/A';
       const telefono = resultado.telefono || 'N/A';
 
@@ -539,7 +539,7 @@ function showIndividualResult(data) {
             </div>
             <div>
               <span class="font-medium text-gray-700">Estado API:</span>
-              <span class="ml-2 ${statusColor}">${esExitoso ? 'Exitosa' : 'Fallida'}</span>
+              <span class="ml-2 ${statusColor}">${apiFunciono ? 'Exitosa' : 'Fallida'}</span>
             </div>
           </div>
           ${mensaje !== '-' ? `<div class="mt-2 text-sm"><span class="font-medium text-gray-700">Detalle:</span> ${mensaje}</div>` : ''}
@@ -731,7 +731,7 @@ async function autoCreateCampaign(datos, verificarEn) {
       return {
         telefono: r.telefono || r.numero || 'N/A',
         entorno: r.origen || r.entorno || verificarEn.join('-'),
-        exito: r.exitoso === true, // Guardar como exito (sin acento) para validar con el schema del servidor
+        exito: r.datos !== undefined, // exito = la API funcionó (tiene datos)
         vinculado: vinculado,
         mensaje: r.mensaje || r.error || r.datos?.mensaje
       };
@@ -889,10 +889,10 @@ function formatBulkResults(data) {
 
       resultados.forEach((resultado, index) => {
         console.log(`[formatBulkResults] Resultado ${index}:`, resultado);
-        // Usar exitoso (con acento) como viene del servidor
-        const esExitoso = resultado.exitoso === true;
-        const statusBg = esExitoso ? 'bg-green-50' : 'bg-red-50';
-        const statusText = esExitoso ? 'Exitosa' : 'Fallida';
+        // Estado API: Exitosa si la API respondió (tiene datos), Fallida si hubo error
+        const apiFunciono = resultado.datos !== undefined;
+        const statusBg = apiFunciono ? 'bg-green-50' : 'bg-red-50';
+        const statusText = apiFunciono ? 'Exitosa' : 'Fallida';
         const entorno = resultado.origen || resultado.entorno || 'N/A';
         const telefono = resultado.telefono || resultado.numero || 'N/A';
 
@@ -978,7 +978,7 @@ if (downloadResultsBtn) {
         }
       }
 
-      const estado = resultado.exitoso === true ? 'Exitosa' : 'Fallida';
+      const estado = resultado.datos !== undefined ? 'Exitosa' : 'Fallida';
       const mensaje = resultado.mensaje || resultado.error || resultado.datos?.mensaje || '-';
       csvContent += `${telefono},${entorno},${vinculado},${estado},${mensaje}\n`;
     });
@@ -1035,7 +1035,7 @@ saveCampaignBtn?.addEventListener('click', async () => {
       return {
         telefono: r.telefono || r.numero || 'N/A',
         entorno: r.origen || r.entorno || entorno,
-        exito: r.exitoso === true,
+        exito: r.datos !== undefined, // exito = la API funcionó (tiene datos)
         vinculado: vinculado,
         mensaje: r.mensaje || r.error || r.datos?.mensaje
       };
@@ -1062,8 +1062,8 @@ saveCampaignBtn?.addEventListener('click', async () => {
         entorno,
         estadisticas: datos.estadisticas || {
           totalProcesados: resultados.length,
-          exitosos: resultados.filter(r => r.exitoso === true).length,
-          fallidos: resultados.filter(r => r.exitoso === false).length,
+          exitosos: resultados.filter(r => r.datos !== undefined).length,
+          fallidos: resultados.filter(r => r.datos === undefined).length,
           tiempoTotal: 0
         }
       })
@@ -1177,6 +1177,25 @@ function renderCampaignRow(campana) {
     minute: '2-digit'
   });
 
+  // Fecha de última actualización
+  const ultimaActualizacion = campana.ultima_actualizacion
+    ? new Date(campana.ultima_actualizacion).toLocaleString('es-ES', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : '<span class="text-slate-400">No actualizada</span>';
+
+  // Verificar si ha sido actualizada después de la creación
+  const fueActualizada = campana.ultima_actualizacion &&
+    new Date(campana.ultima_actualizacion).getTime() > new Date(campana.fecha).getTime();
+
+  const ultimaActualizacionClass = fueActualizada
+    ? 'text-emerald-700 font-medium'
+    : 'text-slate-500';
+
   return `
     <tr class="transition hover:bg-slate-50/80">
       <td class="px-8 py-5">
@@ -1191,6 +1210,9 @@ function renderCampaignRow(campana) {
             <p class="mt-1 text-xs text-slate-500">${dateStr}</p>
           </div>
         </div>
+      </td>
+      <td class="px-4 py-5">
+        <p class="${ultimaActualizacionClass}">${ultimaActualizacion}</p>
       </td>
       <td class="px-4 py-5">
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
@@ -1247,6 +1269,29 @@ function renderCampaignRow(campana) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
             </svg>
           </button>
+          <button onclick="reconsultarCampaign('${campana.id}')" class="rounded-2xl border border-emerald-500 bg-emerald-50 p-2.5 text-emerald-700 hover:bg-emerald-100 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+    <!-- Fila de progreso de actualización (oculta por defecto) -->
+    <tr id="updating-${campana.id}" class="hidden">
+      <td colspan="6" class="px-8 py-4 bg-emerald-50/50">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <p id="status-${campana.id}" class="text-sm font-medium text-emerald-700">
+              Iniciando actualización...
+            </p>
+            <span id="progress-text-${campana.id}" class="text-xs text-emerald-600">
+              Preparando...
+            </span>
+          </div>
+          <div class="h-2.5 rounded-full bg-emerald-100 overflow-hidden">
+            <div id="progress-${campana.id}" class="h-full rounded-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+          </div>
         </div>
       </td>
     </tr>
@@ -1269,12 +1314,35 @@ function renderCampaignMobileCard(campana) {
     minute: '2-digit'
   });
 
+  // Fecha de última actualización
+  const ultimaActualizacion = campana.ultima_actualizacion
+    ? new Date(campana.ultima_actualizacion).toLocaleString('es-ES', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : 'No actualizada';
+
+  // Verificar si ha sido actualizada
+  const fueActualizada = campana.ultima_actualizacion &&
+    new Date(campana.ultima_actualizacion).getTime() > new Date(campana.fecha).getTime();
+
+  const ultimaActualizacionClass = fueActualizada
+    ? 'text-emerald-700 font-medium text-xs'
+    : 'text-slate-500 text-xs';
+
   return `
     <div class="rounded-3xl border border-slate-200 bg-white p-5">
       <div class="mb-4 flex items-start justify-between gap-3">
         <div>
           <p class="font-bold text-slate-950">${campana.nombre}</p>
           <p class="mt-1 text-xs text-slate-500">${dateStr}</p>
+          ${fueActualizada
+            ? `<p class="mt-1 ${ultimaActualizacionClass}">Actualizado: ${ultimaActualizacion}</p>`
+            : ''
+          }
         </div>
         <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

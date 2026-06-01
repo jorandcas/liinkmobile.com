@@ -41,6 +41,8 @@ export class DistribuidorService {
 
   /**
    * Validar un número de teléfono en un ambiente específico
+   * NOTA: exitoso indica si la API respondió correctamente (HTTP 200)
+   * El campo datos.data.enrolado indica si el DN está vinculado o no
    */
   async validarEnAmbiente(
     telefono: string,
@@ -54,6 +56,7 @@ export class DistribuidorService {
       const client = new ApiClient(this.apiKey);
       const datos = await client.get<any>(url);
 
+      // exitoso = true si la API respondió correctamente (sin importar enrolado)
       const resultado = {
         telefono,
         exitoso: true,
@@ -67,7 +70,7 @@ export class DistribuidorService {
         origen: ambiente
       };
 
-      // Guardar en BD del tenant
+      // Guardar en BD del tenant (exitoso = true porque la API funcionó)
       await this.guardarValidacion(telefono, resultado, ambiente, true);
 
       return resultado;
@@ -219,24 +222,40 @@ export class DistribuidorService {
 
     const resultados = await this.validarLote(telefonos, ambientes, maxConcurrent, onProgress);
 
-    // Estadísticas
+    // Estadísticas con 3 categorías: vinculados, noVinculados, errores
     console.log(`[Tenant ${this.tenantId}] Resultados recibidos: ${resultados.length}`);
     resultados.forEach((r, i) => {
       console.log(`[Tenant ${this.tenantId}] Resultado ${i}: exitoso=${r.exitoso}, telefono=${r.telefono}`);
     });
 
-    const exitosos = resultados.filter(r => r.exitoso).length;
-    const fallidos = resultados.filter(r => !r.exitoso).length;
+    // Categorizar resultados:
+    // - vinculados: API funcionó + enrolado === true
+    // - noVinculados: API funcionó + enrolado === false
+    // - errores: API falló (exitoso === false)
+    const vinculados = resultados.filter(r => {
+      if (!r.exitoso || !r.datos) return false;
+      return r.datos.data?.enrolado === true;
+    }).length;
+
+    const noVinculados = resultados.filter(r => {
+      if (!r.exitoso || !r.datos) return false;
+      return r.datos.data?.enrolado === false;
+    }).length;
+
+    const erroresCount = resultados.filter(r => !r.exitoso).length;
     const errores = resultados
       .filter(r => !r.exitoso)
       .map(r => `${r.telefono} (${r.origen}): ${r.error}`);
 
-    console.log(`[Tenant ${this.tenantId}] Estadísticas: exitosos=${exitosos}, fallidos=${fallidos}`);
+    console.log(`[Tenant ${this.tenantId}] Estadísticas: vinculados=${vinculados}, noVinculados=${noVinculados}, errores=${erroresCount}`);
 
     return {
       totalProcesados: resultados.length,
-      exitosos,
-      fallidos,
+      exitosos: vinculados, // Por compatibilidad con el frontend
+      fallidos: noVinculados + erroresCount, // Por compatibilidad con el frontend
+      vinculados,
+      noVinculados,
+      erroresCount,
       resultados,
       errores
     };
@@ -259,18 +278,35 @@ export class DistribuidorService {
   }
 
   /**
-   * Obtener estadísticas de validación
+   * Obtener estadísticas de validación con 3 categorías
    */
   obtenerEstadisticas(resultados: ResultadoValidacion[]): {
     total: number;
     exitosos: number;
     fallidos: number;
+    vinculados: number;
+    noVinculados: number;
+    erroresCount: number;
     porcentajeExito: number;
     porcentajeFallo: number;
     porAmbiente: Map<'QA' | 'PROD', { exitosos: number; fallidos: number }>;
   } {
-    const exitosos = resultados.filter(r => r.exitoso).length;
-    const fallidos = resultados.filter(r => !r.exitoso).length;
+    // Categorizar en 3 grupos
+    const vinculados = resultados.filter(r => {
+      if (!r.exitoso || !r.datos) return false;
+      return r.datos.data?.enrolado === true;
+    }).length;
+
+    const noVinculados = resultados.filter(r => {
+      if (!r.exitoso || !r.datos) return false;
+      return r.datos.data?.enrolado === false;
+    }).length;
+
+    const erroresCount = resultados.filter(r => !r.exitoso).length;
+
+    // Por compatibilidad con código existente
+    const exitosos = vinculados;
+    const fallidos = noVinculados + erroresCount;
 
     const porAmbiente = new Map<'QA' | 'PROD', { exitosos: number; fallidos: number }>();
 
@@ -286,6 +322,9 @@ export class DistribuidorService {
       total: resultados.length,
       exitosos,
       fallidos,
+      vinculados,
+      noVinculados,
+      erroresCount,
       porcentajeExito: (exitosos / resultados.length) * 100,
       porcentajeFallo: (fallidos / resultados.length) * 100,
       porAmbiente

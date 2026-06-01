@@ -2,7 +2,7 @@ import { Campana, CrearCampanaRequest, ResultadoCampana } from '../types/campana
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { DistribuidorService } from './distribuidor.service';
-import { getTenantApiKey } from './tenant.service';
+import { getTenantApiKey, getTenantDatabaseConfig } from './tenant.service';
 
 /**
  * Servicio de campañas
@@ -221,6 +221,7 @@ export class CampanaService {
       id: this.generarId(),
       nombre: `Campaña ${numeroCampana}`,
       fecha: new Date(),
+      ultima_actualizacion: new Date(),
       tipo: 'multiple',
       entorno: 'PROD',
       estadisticas: {
@@ -288,14 +289,23 @@ export class CampanaService {
 
       console.log(`[CampanaService] Reconsultando ${fallidos.length} DN fallidos de campaña ${campaignId}`);
 
-      // Obtener API Key del tenant
+      // Obtener API Key y configuración de BD del tenant
       const apiKeyResult = await getTenantApiKey(tenantId);
       if (!apiKeyResult.success || !apiKeyResult.apiKey) {
         throw new Error('No se pudo obtener API Key del tenant');
       }
 
-      // Crear servicio de distribuidor
-      const distribuidorService = new DistribuidorService(apiKeyResult.apiKey);
+      const dbConfigResult = await getTenantDatabaseConfig(tenantId);
+      if (!dbConfigResult.success || !dbConfigResult.config) {
+        throw new Error('No se pudo obtener configuración de base de datos del tenant');
+      }
+
+      // Crear servicio de distribuidor con parámetros correctos
+      const distribuidorService = new DistribuidorService(
+        tenantId,
+        dbConfigResult.config,
+        apiKeyResult.apiKey
+      );
 
       // Reconsultar cada DN fallido
       let actualizados = 0;
@@ -321,12 +331,18 @@ export class CampanaService {
           if (indiceOriginal !== -1 && resultados[0]) {
             const nuevoResultado = resultados[0];
 
+            // Extraer estado de vinculación desde la respuesta de la API
+            // La API devuelve: { success: true, data: { dn: "...", enrolado: true/false } }
+            const enrolado = nuevoResultado.datos?.data?.enrolado ?? false;
+
             // Actualizar resultado
             campana.resultados[indiceOriginal] = {
               ...campana.resultados[indiceOriginal],
-              exito: nuevoResultado.exitoso,
-              vinculado: nuevoResultado.datos?.enrolado || false,
-              mensaje: nuevoResultado.exitoso ? 'DN validado correctamente' : nuevoResultado.error,
+              exito: nuevoResultado.exitoso && enrolado,
+              vinculado: enrolado,
+              mensaje: enrolado
+                ? 'DN validado correctamente y está vinculado'
+                : 'DN no encontrado o no vinculado',
               ultima_consulta: new Date(),
               actualizado_en_revision: true // Marcar como actualizado en esta revisión
             };
