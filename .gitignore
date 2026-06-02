@@ -43,3 +43,25 @@ coverage/
 
 # Documentation
 .contenido_sistema.md
+
+# Additional files to exclude
+# Deployment docs (keep local)
+DESPLEGUE_COOLIFY.md
+TESTING_GUIDE.md
+
+# Test/Diagnostic scripts
+check-*.js
+diagnostico.js
+fix-*.js
+create-*.js
+delete-*.js
+cleanup-*.js
+
+# Postman collections
+*.postman_collection.json
+
+# OS specific
+nul
+
+# Examples page
+examples/page
