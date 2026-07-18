@@ -43,6 +43,7 @@ coverage/
 
 # Documentation
 .contenido_sistema.md
+PRESENTACION_COMERCIAL.md
 
 # Additional files to exclude
 # Deployment docs (keep local)

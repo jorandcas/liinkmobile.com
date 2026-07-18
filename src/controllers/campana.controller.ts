@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { CampanaService } from '../services/campana.service';
+import { CampanaServiceDB } from '../services/campana.service.db';
 
 /**
  * Schema para crear campaña
@@ -35,8 +35,17 @@ export class CampanaController {
       // Validar datos
       const datos = crearCampanaSchema.parse(req.body);
       const usuarioEmail = (req as any).user?.email || 'desconocido';
+      const tenantId = (req as any).user?.tenant_id;
 
-      const campana = await CampanaService.crear(datos, usuarioEmail);
+      if (!tenantId) {
+        res.status(401).json({
+          exito: false,
+          mensaje: 'No autorizado - Usuario sin tenant_id'
+        });
+        return;
+      }
+
+      const campana = await CampanaServiceDB.crear(datos, usuarioEmail, tenantId);
 
       res.json({
         exito: true,
@@ -67,9 +76,19 @@ export class CampanaController {
   static async obtenerTodas(req: Request, res: Response): Promise<void> {
     try {
       const usuarioEmail = (req as any).user?.email;
+      const tenantId = (req as any).user?.tenant_id;
+
+      if (!tenantId) {
+        res.status(401).json({
+          exito: false,
+          mensaje: 'No autorizado - Usuario sin tenant_id'
+        });
+        return;
+      }
+
       const campanas = usuarioEmail
-        ? await CampanaService.obtenerPorUsuario(usuarioEmail)
-        : await CampanaService.obtenerTodas();
+        ? await CampanaServiceDB.obtenerPorUsuario(usuarioEmail, tenantId)
+        : await CampanaServiceDB.obtenerTodas(tenantId);
 
       res.json({
         exito: true,
@@ -90,7 +109,17 @@ export class CampanaController {
   static async obtenerPorId(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const campana = await CampanaService.obtenerPorId(id);
+      const tenantId = (req as any).user?.tenant_id;
+
+      if (!tenantId) {
+        res.status(401).json({
+          exito: false,
+          mensaje: 'No autorizado - Usuario sin tenant_id'
+        });
+        return;
+      }
+
+      const campana = await CampanaServiceDB.obtenerPorId(id, tenantId);
 
       if (!campana) {
         res.status(404).json({
@@ -119,7 +148,17 @@ export class CampanaController {
   static async eliminar(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const eliminada = await CampanaService.eliminar(id);
+      const tenantId = (req as any).user?.tenant_id;
+
+      if (!tenantId) {
+        res.status(401).json({
+          exito: false,
+          mensaje: 'No autorizado - Usuario sin tenant_id'
+        });
+        return;
+      }
+
+      const eliminada = await CampanaServiceDB.eliminar(id, tenantId);
 
       if (!eliminada) {
         res.status(404).json({
@@ -166,9 +205,19 @@ export class CampanaController {
   /**
    * Obtener siguiente número de campaña
    */
-  static async obtenerSiguienteNumero(_req: Request, res: Response): Promise<void> {
+  static async obtenerSiguienteNumero(req: Request, res: Response): Promise<void> {
     try {
-      const numero = await CampanaService.obtenerSiguienteNumero();
+      const tenantId = (req as any).user?.tenant_id;
+
+      if (!tenantId) {
+        res.status(401).json({
+          exito: false,
+          mensaje: 'No autorizado - Usuario sin tenant_id'
+        });
+        return;
+      }
+
+      const numero = await CampanaServiceDB.obtenerSiguienteNumero(tenantId);
 
       res.json({
         exito: true,
@@ -206,7 +255,7 @@ export class CampanaController {
       res.setHeader('Connection', 'keep-alive');
 
       // Verificar si hay otra campaña actualizándose
-      const campaignUpdating = CampanaService.getCampaignUpdating();
+      const campaignUpdating = CampanaServiceDB.getCampaignUpdating();
       if (campaignUpdating) {
         res.write(`data: ${JSON.stringify({
           type: 'error',
@@ -217,7 +266,7 @@ export class CampanaController {
       }
 
       // Obtener campaña para contar fallidos
-      const campana = await CampanaService.obtenerPorId(id);
+      const campana = await CampanaServiceDB.obtenerPorId(id, tenantId);
       if (!campana) {
         res.write(`data: ${JSON.stringify({
           type: 'error',
@@ -253,7 +302,7 @@ export class CampanaController {
       // Ejecutar re-consulta con callback de progreso
       try {
         console.log('[CampanaController] Iniciando re-consulta...');
-        const campanaActualizada = await CampanaService.reconsultarFallidos(
+        const campanaActualizada = await CampanaServiceDB.reconsultarFallidos(
           id,
           tenantId,
           (procesados, total) => {

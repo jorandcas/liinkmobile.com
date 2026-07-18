@@ -29,7 +29,8 @@
       "Bash(npm uninstall:*)",
       "Bash(move:*)",
       "Bash(git rm:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "mcp__zai-mcp-server__extract_text_from_screenshot"
     ]
   }
 }

@@ -59,10 +59,11 @@ services:
     ports:
       - "3000:3000"
 
-    # Volúmenes para logs y uploads
+    # Volúmenes para logs y uploads (PERSISTENTES)
     volumes:
       - app-logs:/app/logs
       - app-uploads:/app/uploads
+      - app-data:/app/data
 
     # Redes
     networks:
@@ -113,6 +114,10 @@ volumes:
 
   app-uploads:
     name: dn-verification-uploads
+    driver: local
+
+  app-data:
+    name: dn-verification-data
     driver: local
 
 # ============================================
