@@ -55,9 +55,14 @@ services:
       retries: 3
       start_period: 40s
 
-    # Exponer puerto
-    ports:
-      - "3000:3000"
+    # Labels para Traefik (proxy inverso)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.liinkmobile.rule=Host(`liinkmobile.com`)"
+      - "traefik.http.routers.liinkmobile.entrypoints=https,http"
+      - "traefik.http.services.liinkmobile.loadbalancer.server.port=3000"
+      - "traefik.http.routers.liinkmobile.tls=true"
+      - "traefik.http.routers.liinkmobile.tls.certresolver=letsencrypt"
 
     # Volúmenes para logs y uploads (PERSISTENTES)
     volumes:
@@ -65,9 +70,10 @@ services:
       - app-uploads:/app/uploads
       - app-data:/app/data
 
-    # Redes
+    # Redes (conecta a ambas redes)
     networks:
-      - dn-verification-network
+      - dn-verification-network  # Para comunicación con PostgreSQL
+      - coolify                    # Para comunicación con Traefik
 
   # ============================================
   # BASE DE DATOS POSTGRESQL
@@ -127,3 +133,7 @@ networks:
   dn-verification-network:
     name: dn-verification-network
     driver: bridge
+
+  coolify:
+    name: coolify
+    external: true  # Conecta a la red existente de Coolify donde está Traefik
