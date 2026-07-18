@@ -182,16 +182,13 @@ export class CampanaController {
   }
 
   /**
-   * Crear campaña de prueba
+   * Crear campaña de prueba (desactivado - no disponible en PostgreSQL)
    */
   static async crearPrueba(_req: Request, res: Response): Promise<void> {
     try {
-      const campana = await CampanaService.crearCampanaPrueba();
-
-      res.json({
-        exito: true,
-        mensaje: 'Campaña de prueba creada',
-        datos: campana
+      res.status(501).json({
+        exito: false,
+        mensaje: 'Endpoint de prueba no disponible en producción con PostgreSQL'
       });
     } catch (error) {
       console.error('[CampanaController] Error:', error);

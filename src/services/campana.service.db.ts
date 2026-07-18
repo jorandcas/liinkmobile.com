@@ -1,5 +1,5 @@
-import { Campana, CrearCampanaRequest, ResultadoCampana } from '../types/campana.types';
-import { Pool, PoolClient } from 'pg';
+import { Campana, CrearCampanaRequest } from '../types/campana.types';
+import { Pool } from 'pg';
 import { getTenantDatabaseConfig } from './tenant.service';
 import { DistribuidorService } from './distribuidor.service';
 import { getTenantApiKey } from './tenant.service';
@@ -230,7 +230,7 @@ export class CampanaServiceDB {
         [id]
       );
 
-      return result.rowCount > 0;
+      return (result.rowCount ?? 0) > 0;
 
     } finally {
       await pool.end();
@@ -260,7 +260,7 @@ export class CampanaServiceDB {
       );
     }
 
-    let pool: Pool;
+    let pool: Pool | null = null;
 
     try {
       pool = await this.getTenantConnection(tenantId);

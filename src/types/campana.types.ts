@@ -14,6 +14,13 @@ export interface Campana {
     exitosos: number;
     fallidos: number;
     tiempoTotal: number;
+    // Propiedades adicionales para mapeo desde BD
+    total_telefonos?: number;
+    validados?: number;
+    vinculados?: number;
+    no_vinculados?: number;
+    errores?: number;
+    porcentaje_vinculacion?: number;
   };
   resultados: ResultadoCampana[];
   creadoPor: string; // email del usuario
@@ -38,5 +45,12 @@ export interface CrearCampanaRequest {
     exitosos: number;
     fallidos: number;
     tiempoTotal: number;
+    // Propiedades adicionales para mapeo a BD
+    total_telefonos?: number;
+    validados?: number;
+    vinculados?: number;
+    no_vinculados?: number;
+    errores?: number;
+    porcentaje_vinculacion?: number;
   };
 }
