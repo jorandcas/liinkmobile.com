@@ -21,7 +21,8 @@ services:
       - PORT=3000
 
       # Base de datos (conecta al servicio postgres)
-      - DB_HOST=postgres
+      # Alias DNS único para evitar colisión con el alias postgres de coolify-db
+      - DB_HOST=liinkmobile-postgres
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD}
@@ -104,7 +105,9 @@ services:
 
     # Redes
     networks:
-      - dn-verification-network
+      dn-verification-network:
+        aliases:
+          - liinkmobile-postgres
 
 # ============================================
 # VOLÚMENES
