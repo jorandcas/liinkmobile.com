@@ -8,6 +8,7 @@ import { createSuperAdminRouter } from './routes/superadmin.routes';
 import { createCampanaRouter } from './routes/campana.routes';
 import { createConfigRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
+import { bootstrapDatabases } from './db/bootstrap';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -96,7 +97,8 @@ function createApp(): Application {
 /**
  * Iniciar servidor
  */
-function startServer(): void {
+async function startServer(): Promise<void> {
+  await bootstrapDatabases();
   const app = createApp();
   const PORT = process.env.PORT || 3000;
 
@@ -123,7 +125,10 @@ function startServer(): void {
 
 // Iniciar si se ejecuta directamente
 if (require.main === module) {
-  startServer();
+  startServer().catch((error) => {
+    console.error('[Server] No se pudo preparar la base de datos:', error);
+    process.exit(1);
+  });
 }
 
 export { createApp, startServer };

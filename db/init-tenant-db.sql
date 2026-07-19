@@ -4,12 +4,26 @@
 -- Este script se ejecuta en CADA base de datos de tenant
 -- Ejecutar: psql -U postgres -d bd_tenant_X -f init-tenant-db.sql
 
+-- Tabla de validaciones individuales y masivas
+CREATE TABLE IF NOT EXISTS validaciones (
+  id SERIAL PRIMARY KEY,
+  telefono VARCHAR(20) NOT NULL,
+  resultado JSONB NOT NULL,
+  origen VARCHAR(10) NOT NULL,
+  exitoso BOOLEAN NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_validaciones_telefono ON validaciones(telefono);
+CREATE INDEX IF NOT EXISTS idx_validaciones_origen ON validaciones(origen);
+CREATE INDEX IF NOT EXISTS idx_validaciones_created ON validaciones(created_at);
+
 -- ============================================
 -- TABLA DE CAMPAÑAS
 -- ============================================
 CREATE TABLE IF NOT EXISTS campanas (
   id SERIAL PRIMARY KEY,
-  codigo VARCHAR(20) UNIQUE NOT NULL,           -- CMP-0001, CMP-0002, etc.
+  codigo VARCHAR(64) UNIQUE NOT NULL,           -- Códigos actuales e históricos
   nombre VARCHAR(255) NOT NULL,
   fecha TIMESTAMP DEFAULT NOW(),
   ultima_actualizacion TIMESTAMP DEFAULT NOW(),
@@ -45,12 +59,7 @@ CREATE TABLE IF NOT EXISTS resultados_campana (
   telefono VARCHAR(20) NOT NULL,
   estado VARCHAR(20) NOT NULL CHECK (estado IN ('vinculado', 'no_vinculado', 'error')),
   mensaje TEXT,
-  validado_at TIMESTAMP DEFAULT NOW(),
-
-  -- Índices para búsquedas rápidas
-  INDEX (campana_id),
-  INDEX (telefono),
-  INDEX (estado)
+  validado_at TIMESTAMP DEFAULT NOW()
 );
 
 -- ============================================
@@ -66,6 +75,9 @@ CREATE INDEX IF NOT EXISTS idx_campanas_codigo ON campanas(codigo);
 CREATE INDEX IF NOT EXISTS idx_campanas_estado ON campanas(estado);
 CREATE INDEX IF NOT EXISTS idx_campanas_fecha ON campanas(fecha DESC);
 CREATE INDEX IF NOT EXISTS idx_campanas_creado_por ON campanas(creado_por);
+CREATE INDEX IF NOT EXISTS idx_resultados_campana_id ON resultados_campana(campana_id);
+CREATE INDEX IF NOT EXISTS idx_resultados_telefono ON resultados_campana(telefono);
+CREATE INDEX IF NOT EXISTS idx_resultados_estado ON resultados_campana(estado);
 
 -- ============================================
 -- TRIGGER PARA ACTUALIZAR updated_at
@@ -79,6 +91,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_campana_updated_at ON campanas;
 CREATE TRIGGER trigger_update_campana_updated_at
   BEFORE UPDATE ON campanas
   FOR EACH ROW

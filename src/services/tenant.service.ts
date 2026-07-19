@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 import { encryptApiKey, decryptApiKey } from '../utils/encryption.util';
 import { logAction } from './audit.service';
 
@@ -101,31 +103,16 @@ async function createTenantDatabase(bdName: string): Promise<void> {
     const tenantClient = await tenantPool.connect();
     try {
       await tenantClient.query('BEGIN');
-
-      // Crear tabla de validaciones
-      await tenantClient.query(`
-        CREATE TABLE IF NOT EXISTS validaciones (
-          id SERIAL PRIMARY KEY,
-          telefono VARCHAR(20) NOT NULL,
-          resultado JSONB NOT NULL,
-          origen VARCHAR(10) NOT NULL,
-          exitoso BOOLEAN NOT NULL,
-          created_at TIMESTAMP DEFAULT NOW()
-        )
-      `);
-
-      // Crear índices
-      await tenantClient.query('CREATE INDEX IF NOT EXISTS idx_validaciones_telefono ON validaciones(telefono)');
-      await tenantClient.query('CREATE INDEX IF NOT EXISTS idx_validaciones_origen ON validaciones(origen)');
-      await tenantClient.query('CREATE INDEX IF NOT EXISTS idx_validaciones_created ON validaciones(created_at)');
-
+      const schemaPath = path.join(process.cwd(), 'db', 'init-tenant-db.sql');
+      const schema = fs.readFileSync(schemaPath, 'utf8');
+      await tenantClient.query(schema);
       await tenantClient.query('COMMIT');
     } catch (error) {
       await tenantClient.query('ROLLBACK');
       throw error;
     } finally {
       tenantClient.release();
-      tenantPool.end();
+      await tenantPool.end();
     }
 
     console.log(`[TenantService] Base de datos '${bdName}' creada exitosamente`);

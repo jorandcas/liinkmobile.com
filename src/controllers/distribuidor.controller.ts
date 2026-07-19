@@ -146,8 +146,9 @@ export class DistribuidorController {
     try {
       // Configurar headers SSE
       res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
       res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
       res.flushHeaders();
 
       // Verificar archivo
@@ -222,8 +223,11 @@ export class DistribuidorController {
     } catch (error) {
       console.error('[Controller] Error en validación masiva:', error);
 
-      if (!res.headersSent) {
-        res.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Error desconocido' })}\n\n`);
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({
+          tipo: 'error',
+          error: error instanceof Error ? error.message : 'Error desconocido'
+        })}\n\n`);
         res.end();
       }
     } finally {
