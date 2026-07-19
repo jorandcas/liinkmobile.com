@@ -59,6 +59,14 @@ export class CampanaServiceDB {
       const codigo = codigoResult.rows[0].codigo;
 
       const ahora = new Date();
+      const totalTelefonos = datos.resultados.length;
+      const vinculados = datos.resultados.filter(resultado => resultado.exito && resultado.vinculado).length;
+      const errores = datos.resultados.filter(resultado => !resultado.exito).length;
+      const noVinculados = totalTelefonos - vinculados - errores;
+      const validados = totalTelefonos - errores;
+      const porcentajeVinculacion = totalTelefonos > 0
+        ? vinculados / totalTelefonos * 100
+        : 0;
 
       // Insertar campaña
       const insertResult = await pool.query(
@@ -77,13 +85,13 @@ export class CampanaServiceDB {
           datos.resultados.length > 1 ? 'multiple' : 'individual',
           datos.entorno,
           usuarioEmail,
-          datos.estadisticas.total_telefonos || 0,
-          datos.estadisticas.validados || 0,
-          datos.estadisticas.vinculados || 0,
-          datos.estadisticas.no_vinculados || 0,
-          datos.estadisticas.errores || 0,
-          datos.estadisticas.porcentaje_vinculacion || 0,
-          'pendiente'
+          totalTelefonos,
+          validados,
+          vinculados,
+          noVinculados,
+          errores,
+          porcentajeVinculacion,
+          'completada'
         ]
       );
 
@@ -97,7 +105,9 @@ export class CampanaServiceDB {
           [
             campanaId,
             resultado.telefono,
-            resultado.exito && resultado.vinculado ? 'vinculado' : 'no_vinculado',
+            !resultado.exito
+              ? 'error'
+              : resultado.vinculado ? 'vinculado' : 'no_vinculado',
             resultado.mensaje || '',
             ahora
           ]
@@ -132,7 +142,7 @@ export class CampanaServiceDB {
               'estado', r.estado,
               'mensaje', r.mensaje,
               'ultima_consulta', r.validado_at,
-              'exito', CASE WHEN r.estado = 'vinculado' THEN true ELSE false END,
+              'exito', CASE WHEN r.estado != 'error' THEN true ELSE false END,
               'vinculado', CASE WHEN r.estado = 'vinculado' THEN true ELSE false END
             )
           ) as resultados
@@ -164,7 +174,7 @@ export class CampanaServiceDB {
               'estado', r.estado,
               'mensaje', r.mensaje,
               'ultima_consulta', r.validado_at,
-              'exito', CASE WHEN r.estado = 'vinculado' THEN true ELSE false END,
+              'exito', CASE WHEN r.estado != 'error' THEN true ELSE false END,
               'vinculado', CASE WHEN r.estado = 'vinculado' THEN true ELSE false END
             )
           ) as resultados
@@ -199,7 +209,7 @@ export class CampanaServiceDB {
               'estado', r.estado,
               'mensaje', r.mensaje,
               'ultima_consulta', r.validado_at,
-              'exito', CASE WHEN r.estado = 'vinculado' THEN true ELSE false END,
+              'exito', CASE WHEN r.estado != 'error' THEN true ELSE false END,
               'vinculado', CASE WHEN r.estado = 'vinculado' THEN true ELSE false END
             )
           ) as resultados

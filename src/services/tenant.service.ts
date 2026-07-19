@@ -37,7 +37,8 @@ async function validateApiKey(apiKey: string): Promise<{
         'Content-Type': 'application/json',
         'ConsumerName': 'Movistar'
       },
-      timeout: 10000 // 10 segundos timeout
+      timeout: 10000, // 10 segundos timeout
+      proxy: false
     });
 
     // Verificar que la respuesta tenga el formato esperado

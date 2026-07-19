@@ -492,7 +492,7 @@ function showIndividualResult(data) {
 
     data.datos.forEach(resultado => {
       // Estado API: Exitosa si la API respondió (tiene datos), Fallida si hubo error
-      const apiFunciono = resultado.datos !== undefined;
+      const apiFunciono = resultado.exitoso === true;
       const bgColor = apiFunciono ? 'bg-green-50' : 'bg-red-50';
       const statusColor = apiFunciono ? 'text-green-700' : 'text-red-700';
       const entorno = resultado.origen || 'N/A';
@@ -731,7 +731,7 @@ async function autoCreateCampaign(datos, verificarEn) {
       return {
         telefono: r.telefono || r.numero || 'N/A',
         entorno: r.origen || r.entorno || verificarEn.join('-'),
-        exito: r.datos !== undefined, // exito = la API funcionó (tiene datos)
+        exito: r.exitoso === true, // La API respondió correctamente, aunque no esté vinculado
         vinculado: vinculado,
         mensaje: r.mensaje || r.error || r.datos?.mensaje
       };
@@ -890,7 +890,7 @@ function formatBulkResults(data) {
       resultados.forEach((resultado, index) => {
         console.log(`[formatBulkResults] Resultado ${index}:`, resultado);
         // Estado API: Exitosa si la API respondió (tiene datos), Fallida si hubo error
-        const apiFunciono = resultado.datos !== undefined;
+        const apiFunciono = resultado.exitoso === true;
         const statusBg = apiFunciono ? 'bg-green-50' : 'bg-red-50';
         const statusText = apiFunciono ? 'Exitosa' : 'Fallida';
         const entorno = resultado.origen || resultado.entorno || 'N/A';
@@ -978,7 +978,7 @@ if (downloadResultsBtn) {
         }
       }
 
-      const estado = resultado.datos !== undefined ? 'Exitosa' : 'Fallida';
+      const estado = resultado.exitoso === true ? 'Exitosa' : 'Fallida';
       const mensaje = resultado.mensaje || resultado.error || resultado.datos?.mensaje || '-';
       csvContent += `${telefono},${entorno},${vinculado},${estado},${mensaje}\n`;
     });

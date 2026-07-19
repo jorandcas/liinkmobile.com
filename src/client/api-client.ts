@@ -18,6 +18,8 @@ export class ApiClient {
 
     this.client = axios.create({
       timeout: API_CONFIG.timeouts.response,
+      // Los endpoints usan IP directa y no deben heredar proxies HTTP del entorno.
+      proxy: false,
       headers: {
         ...API_CONFIG.defaultHeaders,
         'x-api-key': this.apiKey
