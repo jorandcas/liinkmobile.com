@@ -28,6 +28,9 @@ const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressText = document.getElementById('progressText');
 const progressDetail = document.getElementById('progressDetail');
+const progressProcessed = document.getElementById('progressProcessed');
+const progressElapsed = document.getElementById('progressElapsed');
+const progressRemaining = document.getElementById('progressRemaining');
 const noFileSelected = document.getElementById('noFileSelected');
 const fileSelected = document.getElementById('fileSelected');
 const selectedFileName = document.getElementById('selectedFileName');
@@ -234,24 +237,130 @@ function setLoading(show, message = 'Procesando...') {
 /**
  * Mostrar indicador de carga
  */
-function showProgressBar() {
+let bulkProgressStartedAt = 0;
+let bulkProgressTimer = null;
+let bulkStatusPollingTimer = null;
+let bulkProgressProcessed = 0;
+let bulkProgressTotal = 0;
+
+function formatDuration(totalSeconds) {
+  const seconds = Math.max(0, Math.round(totalSeconds));
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, '0')}`;
+}
+
+function renderBulkProgress() {
+  const elapsedSeconds = bulkProgressStartedAt
+    ? (Date.now() - bulkProgressStartedAt) / 1000
+    : 0;
+  const percentage = bulkProgressTotal > 0
+    ? Math.round((bulkProgressProcessed / bulkProgressTotal) * 100)
+    : 0;
+  const secondsPerDn = bulkProgressProcessed > 0
+    ? elapsedSeconds / bulkProgressProcessed
+    : 3;
+  const remainingSeconds = (bulkProgressTotal - bulkProgressProcessed) * secondsPerDn;
+
+  progressBar.style.width = `${percentage}%`;
+  progressText.textContent = `${percentage}%`;
+  progressProcessed.textContent = `${bulkProgressProcessed} / ${bulkProgressTotal}`;
+  progressElapsed.textContent = formatDuration(elapsedSeconds);
+  progressRemaining.textContent = formatDuration(remainingSeconds);
+}
+
+async function pollBulkProgress() {
+  try {
+    const response = await fetch('/api/validate/bulk/status', {
+      headers: { 'Authorization': `Bearer ${authToken}` },
+      cache: 'no-store'
+    });
+    if (!response.ok) return;
+
+    const payload = await response.json();
+    const status = payload.datos;
+    if (!status || status.total <= 0) return;
+
+    updateProgressBar(status.procesados, status.total);
+    if (status.estado === 'completado') {
+      progressDetail.textContent = 'Validación completada. Preparando resultados...';
+      validateBulkBtn.disabled = false;
+      clearInterval(bulkStatusPollingTimer);
+      bulkStatusPollingTimer = null;
+    } else if (status.estado === 'error') {
+      progressDetail.textContent = status.error || 'La validación terminó con error';
+      validateBulkBtn.disabled = false;
+      clearInterval(bulkStatusPollingTimer);
+      bulkStatusPollingTimer = null;
+    }
+  } catch (error) {
+    console.warn('[Progress] No se pudo consultar el estado:', error);
+  }
+}
+
+function startBulkProgressPolling() {
+  clearInterval(bulkStatusPollingTimer);
+  void pollBulkProgress();
+  bulkStatusPollingTimer = setInterval(pollBulkProgress, 1000);
+}
+
+function showProgressBar(total, iniciadoEn = null) {
+  bulkProgressStartedAt = iniciadoEn ? new Date(iniciadoEn).getTime() : Date.now();
+  bulkProgressProcessed = 0;
+  bulkProgressTotal = total;
   progressContainer.classList.remove('hidden');
-  progressDetail.textContent = 'Validando números de teléfono';
+  progressDetail.textContent = 'Iniciando validación...';
+  renderBulkProgress();
+  clearInterval(bulkProgressTimer);
+  bulkProgressTimer = setInterval(renderBulkProgress, 1000);
+  startBulkProgressPolling();
   console.log('[ProgressBar] Mostrando indicador de carga');
+}
+
+async function getBulkProgressStatus() {
+  const response = await fetch('/api/validate/bulk/status', {
+    headers: { 'Authorization': `Bearer ${authToken}` },
+    cache: 'no-store'
+  });
+  if (!response.ok) return null;
+  const payload = await response.json();
+  return payload.datos;
+}
+
+async function resumeActiveBulkProgress() {
+  try {
+    const status = await getBulkProgressStatus();
+    if (status?.estado !== 'procesando' || status.total <= 0) return false;
+
+    showProgressBar(status.total, status.iniciadoEn);
+    updateProgressBar(status.procesados, status.total);
+    progressDetail.textContent = `Validación activa: ${status.procesados} de ${status.total} DN`;
+    validateBulkBtn.disabled = true;
+    return true;
+  } catch (error) {
+    console.warn('[Progress] No se pudo recuperar la validación activa:', error);
+    return false;
+  }
 }
 
 /**
  * Ocultar indicador de carga
  */
 function hideProgressBar() {
+  clearInterval(bulkProgressTimer);
+  bulkProgressTimer = null;
+  clearInterval(bulkStatusPollingTimer);
+  bulkStatusPollingTimer = null;
   progressContainer.classList.add('hidden');
 }
 
 /**
- * Actualizar indicador de progreso (solo texto, sin contador)
+ * Actualizar indicador de progreso
  */
 function updateProgressBar(procesados, total) {
+  bulkProgressProcessed = procesados;
+  bulkProgressTotal = total;
   progressDetail.textContent = `Validando número ${procesados} de ${total}...`;
+  renderBulkProgress();
   console.log(`[Progreso] ${procesados}/${total} procesados`);
 }
 
@@ -560,6 +669,11 @@ function showIndividualResult(data) {
  * Validar lote desde CSV con SSE
  */
 validateBulkBtn.addEventListener('click', async () => {
+  if (await resumeActiveBulkProgress()) {
+    alert('Ya existe una validación masiva en curso. Se muestra su progreso actual.');
+    return;
+  }
+
   const csvFile = getSelectedFile();
 
   if (!csvFile) {
@@ -575,7 +689,7 @@ validateBulkBtn.addEventListener('click', async () => {
   const cantidadNumeros = lineas.length;
 
   // Confirmar antes de validar con modal personalizado
-  const tiempoEstimado = Math.ceil(cantidadNumeros * 5 / 60); // 5 seg por número
+  const tiempoEstimado = Math.ceil(cantidadNumeros * 3 / 60); // 3 seg por número
   const confirmacion = await showConfirmModal(
     'Confirmar Validación Masiva',
     '¿Deseas continuar con la validación masiva?',
@@ -596,7 +710,7 @@ validateBulkBtn.addEventListener('click', async () => {
   formData.append('maxConcurrent', '10');
 
   // Mostrar barra de progreso
-  showProgressBar();
+  showProgressBar(cantidadNumeros);
   validateBulkBtn.disabled = true;
 
   try {
@@ -646,15 +760,9 @@ validateBulkBtn.addEventListener('click', async () => {
               console.log('[SSE] Validación completada, ocultando barra de progreso');
               hideProgressBar();
 
-              // Crear campaña automáticamente y obtener el nombre
-              console.log('[SSE] Creando campaña automáticamente...');
-              let nombreCampana = '';
-              if (data.datos.totalProcesados > 0) {
-                nombreCampana = await autoCreateCampaign(data.datos, verificarEn);
-                console.log('[SSE] Campaña creada:', nombreCampana);
-              } else {
-                console.log('[SSE] No se creó campaña (totalProcesados = 0)');
-              }
+              // La campaña ya fue persistida por el backend.
+              const nombreCampana = data.campana?.nombre || '';
+              await loadCampaigns();
 
               // Mostrar toast de éxito con el nombre de la campaña
               console.log('[SSE] Mostrando toast con nombre:', nombreCampana);
@@ -742,7 +850,7 @@ async function autoCreateCampaign(datos, verificarEn) {
       totalProcesados: datos.totalProcesados || resultados.length,
       exitosos: datos.exitosos || 0,
       fallidos: datos.fallidos || 0,
-      tiempoTotal: resultados.length * 5 // 5 segundos por validación
+      tiempoTotal: resultados.length * 3 // 3 segundos por validación
     };
 
     const nombreCampana = `Campaña ${numero}`;
@@ -856,7 +964,7 @@ function formatBulkResults(data) {
         </div>
         <div class="bg-white p-3 rounded border">
           <div class="text-xs text-gray-500 uppercase">Tiempo</div>
-          <div class="text-lg font-semibold">${(total * 5 / 60).toFixed(1)}m</div>
+          <div class="text-lg font-semibold">${(total * 3 / 60).toFixed(1)}m</div>
         </div>
       </div>
     `;
@@ -1665,4 +1773,5 @@ logoutBtn.addEventListener('click', logout);
 document.addEventListener('DOMContentLoaded', () => {
   checkAuth();
   initEnvironmentToggle();
+  void resumeActiveBulkProgress();
 });

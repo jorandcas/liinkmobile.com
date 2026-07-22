@@ -3,6 +3,7 @@ import { DistribuidorService } from '../services/distribuidor.service';
 import { getTenantDatabaseConfig, getTenantApiKey } from '../services/tenant.service';
 import { ApiResponse } from '../types/distribuidor.types';
 import { z } from 'zod';
+import { CampanaServiceDB } from '../services/campana.service.db';
 
 /**
  * Schemas de validación con Zod
@@ -17,11 +18,36 @@ const ValidacionMasivaSchema = z.object({
   maxConcurrent: z.number().min(1).max(50).optional()
 });
 
+const tenantsConValidacionActiva = new Set<number>();
+type EstadoValidacionMasiva = {
+  estado: 'procesando' | 'completado' | 'error';
+  procesados: number;
+  total: number;
+  porcentaje: number;
+  iniciadoEn: string;
+  error?: string;
+  campana?: { id: string; nombre: string };
+};
+const progresoValidacionesMasivas = new Map<number, EstadoValidacionMasiva>();
+
 /**
  * Controlador de endpoints de distribuidores - MULTITENANT
  * Cada tenant usa su propia BD y API Key
  */
 export class DistribuidorController {
+  obtenerEstadoMasiva(req: Request, res: Response): void {
+    const tenantId = req.user?.tenant_id;
+    if (!tenantId) {
+      res.status(401).json({ exito: false, mensaje: 'Usuario sin tenant válido' });
+      return;
+    }
+
+    res.json({
+      exito: true,
+      datos: progresoValidacionesMasivas.get(tenantId) || null
+    });
+  }
+
   /**
    * Crear instancia del servicio para el tenant actual
    */
@@ -142,6 +168,8 @@ export class DistribuidorController {
    */
   async validarMasiva(req: Request, res: Response): Promise<void> {
     let service: DistribuidorService | null = null;
+    const tenantId = req.user?.tenant_id;
+    let validationLockAcquired = false;
 
     try {
       // Configurar headers SSE
@@ -150,6 +178,32 @@ export class DistribuidorController {
       res.setHeader('Connection', 'keep-alive');
       res.setHeader('X-Accel-Buffering', 'no');
       res.flushHeaders();
+      res.socket?.setNoDelay(true);
+
+      if (!tenantId) {
+        res.write(`data: ${JSON.stringify({ tipo: 'error', error: 'Usuario sin tenant válido' })}\n\n`);
+        res.end();
+        return;
+      }
+
+      if (tenantsConValidacionActiva.has(tenantId)) {
+        res.write(`data: ${JSON.stringify({
+          tipo: 'error',
+          error: 'Ya existe una validación masiva en curso para este tenant'
+        })}\n\n`);
+        res.end();
+        return;
+      }
+
+      tenantsConValidacionActiva.add(tenantId);
+      validationLockAcquired = true;
+      progresoValidacionesMasivas.set(tenantId, {
+        estado: 'procesando',
+        procesados: 0,
+        total: 0,
+        porcentaje: 0,
+        iniciadoEn: new Date().toISOString()
+      });
 
       // Verificar archivo
       if (!req.file) {
@@ -197,7 +251,16 @@ export class DistribuidorController {
           total,
           porcentaje: Math.round((procesados / total) * 100)
         };
+        const estadoActual = progresoValidacionesMasivas.get(tenantId);
+        progresoValidacionesMasivas.set(tenantId, {
+          estado: 'procesando',
+          procesados,
+          total,
+          porcentaje: progreso.porcentaje,
+          iniciadoEn: estadoActual?.iniciadoEn || new Date().toISOString()
+        });
         res.write(`data: ${JSON.stringify(progreso)}\n\n`);
+        (res as Response & { flush?: () => void }).flush?.();
       };
 
       // Ejecutar validación masiva
@@ -208,11 +271,43 @@ export class DistribuidorController {
         onProgress
       );
 
+      const numeroCampana = await CampanaServiceDB.obtenerSiguienteNumero(tenantId);
+      const entornoCampana = body.verificarEn?.length === 2
+        ? 'AMBOS'
+        : body.verificarEn?.[0] || 'PROD';
+      const campana = await CampanaServiceDB.crear({
+        nombre: `Campaña ${numeroCampana}`,
+        entorno: entornoCampana,
+        resultados: resultado.resultados.map(item => ({
+          telefono: item.telefono,
+          entorno: item.origen,
+          exito: item.exitoso,
+          vinculado: item.datos?.data?.enrolado ?? false,
+          mensaje: item.error || (item.datos as any)?.mensaje
+        })),
+        estadisticas: {
+          totalProcesados: resultado.totalProcesados,
+          exitosos: resultado.exitosos,
+          fallidos: resultado.fallidos,
+          tiempoTotal: resultado.totalProcesados * 3
+        }
+      }, req.user?.email || 'desconocido', tenantId);
+
       // Enviar resultado final
       const resultadoFinal = {
         tipo: 'completo',
-        datos: resultado
+        datos: resultado,
+        campana: { id: campana.id, nombre: campana.nombre }
       };
+      const estadoActual = progresoValidacionesMasivas.get(tenantId);
+      progresoValidacionesMasivas.set(tenantId, {
+        estado: 'completado',
+        procesados: resultado.totalProcesados,
+        total: resultado.totalProcesados,
+        porcentaje: 100,
+        iniciadoEn: estadoActual?.iniciadoEn || new Date().toISOString(),
+        campana: { id: campana.id, nombre: campana.nombre }
+      });
 
       console.log(`[Tenant ${req.user?.tenant_id}] Enviando resultado final:`, JSON.stringify(resultadoFinal, null, 2));
 
@@ -222,6 +317,17 @@ export class DistribuidorController {
       console.log(`[Tenant ${req.user?.tenant_id}] Validación masiva completada: ${resultado.totalProcesados} procesados, ${resultado.exitosos} exitosos, ${resultado.fallidos} fallidos`);
     } catch (error) {
       console.error('[Controller] Error en validación masiva:', error);
+      if (tenantId) {
+        const estadoActual = progresoValidacionesMasivas.get(tenantId);
+        progresoValidacionesMasivas.set(tenantId, {
+          estado: 'error',
+          procesados: estadoActual?.procesados || 0,
+          total: estadoActual?.total || 0,
+          porcentaje: estadoActual?.porcentaje || 0,
+          iniciadoEn: estadoActual?.iniciadoEn || new Date().toISOString(),
+          error: error instanceof Error ? error.message : 'Error desconocido'
+        });
+      }
 
       if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({
@@ -231,6 +337,9 @@ export class DistribuidorController {
         res.end();
       }
     } finally {
+      if (validationLockAcquired && tenantId) {
+        tenantsConValidacionActiva.delete(tenantId);
+      }
       if (service) {
         await service.close();
       }

@@ -1188,10 +1188,6 @@ video {
   border-width: 2px;
 }
 
-.border-4 {
-  border-width: 4px;
-}
-
 .border-b {
   border-bottom-width: 1px;
 }
@@ -1289,11 +1285,6 @@ video {
 .border-yellow-500 {
   --tw-border-opacity: 1;
   border-color: rgb(234 179 8 / var(--tw-border-opacity, 1));
-}
-
-.border-t-emerald-600 {
-  --tw-border-opacity: 1;
-  border-top-color: rgb(5 150 105 / var(--tw-border-opacity, 1));
 }
 
 .bg-\[\#019df4\] {

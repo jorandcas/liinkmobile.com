@@ -54,6 +54,7 @@ export function createDistribuidorRouter(): Router {
    * @access  Private (Tenant Admin o SuperAdmin)
    */
   router.post('/validate/bulk', ...tenantMiddlewares, upload.single('file'), (req, res) => controller.validarMasiva(req, res));
+  router.get('/validate/bulk/status', ...tenantMiddlewares, (req, res) => controller.obtenerEstadoMasiva(req, res));
 
   /**
    * @route   POST /api/validate/batch

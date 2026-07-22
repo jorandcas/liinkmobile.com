@@ -220,6 +220,10 @@ export class DistribuidorService {
       };
     }
 
+    if (onProgress) {
+      onProgress(0, telefonos.length);
+    }
+
     const resultados = await this.validarLote(telefonos, ambientes, maxConcurrent, onProgress);
 
     // Estadísticas con 3 categorías: vinculados, noVinculados, errores
