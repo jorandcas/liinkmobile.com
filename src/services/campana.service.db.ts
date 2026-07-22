@@ -405,7 +405,8 @@ export class CampanaServiceDB {
           noVinculados,
           total > 0 ? (vinculados / total * 100).toFixed(2) : 0,
           new Date(),
-          'completada'
+          'completada',
+          campana.id
         ]
       );
 

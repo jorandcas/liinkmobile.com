@@ -9,7 +9,7 @@
     "build:css": "tailwindcss -i ./public/css/main.css -o ./public/css/output.css",
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
-    "test": "jest",
+    "test": "tsx --test tests/*.test.ts",
     "seed:superadmin": "tsx db/seed-superadmin.ts",
     "migrate:campanas": "tsx db/migrate-campanas-to-db.ts",
     "init:tenant-db": "psql -U postgres -d $0 -f db/init-tenant-db.sql"

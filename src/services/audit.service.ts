@@ -23,7 +23,7 @@ const pool = new Pool({
  * @param ipAddress - Dirección IP del cliente
  */
 export async function logAction(
-  tenantId: number,
+  tenantId: number | null,
   userEmail: string,
   action: string,
   details?: any,
@@ -32,7 +32,7 @@ export async function logAction(
   try {
     await pool.query(
       `INSERT INTO audit_logs (tenant_id, user_email, action, details, ip_address)
-       VALUES ($1, $2, $3, $4, $5)`,
+       VALUES ((SELECT id FROM tenants WHERE id = $1), $2, $3, $4, $5)`,
       [tenantId, userEmail, action, details ? JSON.stringify(details) : null, ipAddress || null]
     );
   } catch (error) {

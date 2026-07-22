@@ -41,7 +41,7 @@ export class AuthController {
       if (!result.success) {
         // Registrar intento fallido
         await logAction(
-          0, // No tenemos userId si falló el login
+          null, // La identidad/tenant no se considera resuelta en un login fallido
           validatedData.email,
           'login_failed',
           { error: result.error },
