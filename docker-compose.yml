@@ -59,6 +59,7 @@ services:
     # Labels para Traefik (proxy inverso)
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
       - "traefik.http.routers.liinkmobile.rule=Host(`liinkmobile.com`)"
       - "traefik.http.routers.liinkmobile.entrypoints=https,http"
       - "traefik.http.services.liinkmobile.loadbalancer.server.port=3000"
