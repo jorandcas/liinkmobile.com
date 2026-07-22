@@ -1,5 +1,5 @@
 import { ApiClient } from '../client/api-client';
-import { getEndpointByEnvironment } from '../config/endpoints.config';
+import { API_CONFIG, getEndpointByEnvironment } from '../config/endpoints.config';
 import { Pool } from 'pg';
 import {
   ResultadoValidacion,
@@ -105,7 +105,7 @@ export class DistribuidorService {
 
       // Pausa entre requests para no sobrecargar la API
       if (ambientes.length > 1) {
-        await new Promise(resolve => setTimeout(resolve, 5000)); // 5 segundos entre requests
+        await new Promise(resolve => setTimeout(resolve, API_CONFIG.concurrency.delayBetweenRequests));
       }
     }
 
@@ -152,9 +152,9 @@ export class DistribuidorService {
         onProgress(i + 1, telefonos.length);
       }
 
-      // Pausa entre teléfonos para no sobrecargar la API (5 segundos)
+      // Pausa entre teléfonos para no sobrecargar la API
       if (i < telefonos.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 5000)); // 5 segundos entre teléfonos
+        await new Promise(resolve => setTimeout(resolve, API_CONFIG.concurrency.delayBetweenRequests));
       }
     }
 

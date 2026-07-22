@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { DistribuidorService } from './distribuidor.service';
 import { getTenantApiKey, getTenantDatabaseConfig } from './tenant.service';
+import { API_CONFIG } from '../config/endpoints.config';
 
 /**
  * Servicio de campañas
@@ -355,9 +356,9 @@ export class CampanaService {
             }
           }
 
-          // Delay de 5 segundos entre requests
+          // Pausa configurada entre requests
           if (i < fallidos.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise(resolve => setTimeout(resolve, API_CONFIG.concurrency.delayBetweenRequests));
           }
         } catch (error) {
           console.error(`[CampanaService] Error al reconsultar ${resultado.telefono}:`, error);

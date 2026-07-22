@@ -46,7 +46,7 @@ export const API_CONFIG = {
   concurrency: {
     maxConcurrent: 1, // Solo 1 petición a la vez (secuencial)
     batchSize: 1,     // Procesar uno por uno
-    delayBetweenRequests: 5000 // 5 segundos entre requests
+    delayBetweenRequests: 3000 // 3 segundos entre requests
   }
 } as const;
 

@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 import { getTenantDatabaseConfig } from './tenant.service';
 import { DistribuidorService } from './distribuidor.service';
 import { getTenantApiKey } from './tenant.service';
+import { API_CONFIG } from '../config/endpoints.config';
 
 /**
  * Servicio de campañas con persistencia en PostgreSQL
@@ -366,9 +367,9 @@ export class CampanaServiceDB {
             }
           }
 
-          // Delay de 5 segundos entre requests
+          // Pausa configurada entre requests
           if (i < fallidos.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise(resolve => setTimeout(resolve, API_CONFIG.concurrency.delayBetweenRequests));
           }
         } catch (error) {
           console.error(`[CampanaServiceDB] Error al reconsultar ${fallido.telefono}:`, error);

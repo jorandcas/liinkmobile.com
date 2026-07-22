@@ -287,7 +287,7 @@ export class CampanaController {
       }
 
       // Enviar evento de inicio con tiempo estimado
-      const tiempoEstimado = total * 5; // 5 segundos por DN
+      const tiempoEstimado = total * 3; // 3 segundos por DN
       console.log('[CampanaController] Enviando evento START - Total:', total, 'Tiempo estimado:', tiempoEstimado);
       res.write(`data: ${JSON.stringify({
         type: 'start',
