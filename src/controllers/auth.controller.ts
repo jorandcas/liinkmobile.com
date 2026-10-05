@@ -122,7 +122,9 @@ export class AuthController {
 
       res.json({
         exito: true,
-        user: result.user
+        user: result.user,
+        isImpersonating: req.user.isImpersonating === true,
+        impersonatedBy: req.user.impersonatedBy
       });
     } catch (error) {
       console.error('[AuthController] Error obteniendo usuario:', error);

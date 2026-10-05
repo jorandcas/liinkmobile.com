@@ -15,6 +15,8 @@ declare global {
         role: string;
         tenant_id: number;
         must_change_password: boolean;
+        isImpersonating?: boolean;
+        impersonatedBy?: number;
       };
     }
   }
@@ -79,7 +81,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         id,
         nombre,
         email,
-        role,
+        role AS account_role,
         tenant_status,
         must_change_password,
         locked_until
@@ -98,6 +100,23 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     }
 
     const user = result.rows[0];
+
+    if (payload.adminAccess === true) {
+      const adminId = Number(payload.adminUserId);
+      const adminResult = await pool.query(
+        `SELECT id, locked_until FROM tenants
+         WHERE id = $1 AND role = 'superadmin' AND tenant_status = 'activo'`,
+        [adminId]
+      );
+      const admin = adminResult.rows[0];
+      if (!Number.isInteger(adminId) || !admin || (admin.locked_until && admin.locked_until > new Date()) || user.account_role !== 'tenant_admin') {
+        res.status(403).json({ exito: false, mensaje: 'Acceso de administración expirado o revocado' });
+        return;
+      }
+    } else if (user.account_role !== payload.role) {
+      res.status(403).json({ exito: false, mensaje: 'El rol de la sesión ya no es válido' });
+      return;
+    }
 
     // Verificar si el tenant está activo
     if (user.tenant_status !== 'activo') {
@@ -124,9 +143,11 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
       id: user.id,
       email: user.email,
       nombre: user.nombre,
-      role: user.role,
+      role: payload.adminAccess === true ? 'tenant_admin' : user.account_role,
       tenant_id: user.id,
-      must_change_password: user.must_change_password
+      must_change_password: payload.adminAccess === true ? false : user.must_change_password,
+      isImpersonating: payload.adminAccess === true,
+      impersonatedBy: payload.adminAccess === true ? Number(payload.adminUserId) : undefined
     };
 
     next();

@@ -26,6 +26,8 @@ export function createSuperAdminRouter(): Router {
    * @access  SuperAdmin
    */
   router.get('/tenants', SuperAdminController.listTenants);
+  router.get('/api-status/schedule', SuperAdminController.getApiStatusSchedule);
+  router.patch('/tenants/:id', SuperAdminController.updateTenant);
 
   /**
    * @route   PATCH /api/superadmin/tenants/:id/suspend
@@ -47,6 +49,9 @@ export function createSuperAdminRouter(): Router {
    * @access  SuperAdmin
    */
   router.get('/tenants/:id/apikey', SuperAdminController.checkTenantApiKey);
+
+  router.post('/tenants/:id/check-api', SuperAdminController.checkTenantApi);
+  router.post('/tenants/:id/access', SuperAdminController.createTenantAccess);
 
   /**
    * @route   GET /api/superadmin/audit-logs

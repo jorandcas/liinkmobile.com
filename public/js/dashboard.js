@@ -36,6 +36,12 @@ const fileSelected = document.getElementById('fileSelected');
 const selectedFileName = document.getElementById('selectedFileName');
 const clearFileBtn = document.getElementById('clearFileBtn');
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[character]);
+}
+
 // DOM Elements - Campañas
 const campaignsList = document.getElementById('campaignsList');
 const createTestCampaignBtn = document.getElementById('createTestCampaign');
@@ -63,8 +69,18 @@ const closeSuccessToast = document.getElementById('closeSuccessToast');
 // DOM Elements - Save Campaign (creado dinámicamente)
 let saveCampaignBtn = null;
 
-// Get token from localStorage
-let authToken = localStorage.getItem('authToken');
+// El acceso temporal de SuperAdmin se conserva solo en esta pestaña.
+const accessTokenFromHash = window.location.hash.slice(1);
+if (accessTokenFromHash) {
+  try {
+    sessionStorage.setItem('adminTenantAccessToken', decodeURIComponent(accessTokenFromHash));
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+  } catch {
+    sessionStorage.removeItem('adminTenantAccessToken');
+  }
+}
+const adminTenantAccessToken = sessionStorage.getItem('adminTenantAccessToken');
+let authToken = adminTenantAccessToken || localStorage.getItem('authToken');
 let lastValidationResults = null;
 let selectedEnvironment = 'PROD'; // Global environment selection (default: PROD)
 
@@ -165,7 +181,7 @@ closeSuccessToast.addEventListener('click', hideSuccessToast);
 function loadDistribuidorConfig() {
   console.log('[Dashboard] Cargando configuración del distribuidor...');
 
-  fetch('/api/config')
+  fetch('/api/config', { headers: { 'Authorization': `Bearer ${authToken}` } })
     .then(response => {
       console.log('[Dashboard] Response status:', response.status);
       return response.json();
@@ -203,6 +219,10 @@ function checkAuth() {
   .then(data => {
     if (data.exito) {
       userName.textContent = data.user.nombre || data.user.email;
+      if (data.isImpersonating) {
+        document.getElementById('adminAccessNotice').classList.remove('hidden');
+        document.getElementById('returnToSuperAdminBtn').classList.remove('hidden');
+      }
       loadDistribuidorConfig();
       loadCampaigns();
     } else {
@@ -218,8 +238,18 @@ function checkAuth() {
  * Cerrar sesión
  */
 function logout() {
+  if (sessionStorage.getItem('adminTenantAccessToken')) {
+    sessionStorage.removeItem('adminTenantAccessToken');
+    window.location.href = '/superadmin.html';
+    return;
+  }
   localStorage.removeItem('authToken');
   window.location.href = '/login.html';
+}
+
+function returnToSuperAdmin() {
+  sessionStorage.removeItem('adminTenantAccessToken');
+  window.location.href = '/superadmin.html';
 }
 
 /**
@@ -588,8 +618,8 @@ function showIndividualResult(data) {
     individualResultContent.innerHTML = `
       <div class="bg-red-50 text-red-700 p-4 rounded-lg">
         <p class="font-medium mb-1">Error</p>
-        <p class="text-sm">${data.mensaje || 'Error en la validación'}</p>
-        ${data.errores && data.errores.length > 0 ? '<ul class="list-disc list-inside text-sm mt-2">' + data.errores.map(e => `<li>${e}</li>`).join('') + '</ul>' : ''}
+        <p class="text-sm">${escapeHtml(data.mensaje || 'Error en la validación')}</p>
+        ${data.errores && data.errores.length > 0 ? '<ul class="list-disc list-inside text-sm mt-2">' + data.errores.map(e => `<li>${escapeHtml(e)}</li>`).join('') + '</ul>' : ''}
       </div>
     `;
     return;
@@ -604,13 +634,13 @@ function showIndividualResult(data) {
       const apiFunciono = resultado.exitoso === true;
       const bgColor = apiFunciono ? 'bg-green-50' : 'bg-red-50';
       const statusColor = apiFunciono ? 'text-green-700' : 'text-red-700';
-      const entorno = resultado.origen || 'N/A';
-      const telefono = resultado.telefono || 'N/A';
+      const entorno = escapeHtml(resultado.origen || 'N/A');
+      const telefono = escapeHtml(resultado.telefono || 'N/A');
 
       // Obtener información del distribuidor desde datos.datos
       const datosInternos = resultado.datos;
       let vinculado = 'Falso';
-      let mensaje = resultado.error || '-';
+      let mensaje = escapeHtml(resultado.error || '-');
       let enrolado = false;
 
       if (datosInternos) {
@@ -652,6 +682,7 @@ function showIndividualResult(data) {
             </div>
           </div>
           ${mensaje !== '-' ? `<div class="mt-2 text-sm"><span class="font-medium text-gray-700">Detalle:</span> ${mensaje}</div>` : ''}
+          ${resultado.codigoError ? `<div class="mt-1 text-xs text-gray-500">Código: ${escapeHtml(resultado.codigoError)}</div>` : ''}
         </div>
       `;
     });

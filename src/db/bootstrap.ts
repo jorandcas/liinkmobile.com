@@ -127,6 +127,11 @@ export async function bootstrapDatabases(): Promise<void> {
   const schema = fs.readFileSync(path.join(process.cwd(), 'db', 'init-tenant-db.sql'), 'utf8');
   const admin = new Pool({ ...connectionBase(), database: process.env.DB_NAME || 'bd_superadmin' });
   try {
+    await admin.query(`
+      ALTER TABLE tenants
+        ADD COLUMN IF NOT EXISTS api_status_checked_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS api_status_error TEXT
+    `);
     const tenants = (await admin.query(
       'SELECT email, bd_name, role FROM tenants WHERE bd_name IS NOT NULL ORDER BY id'
     )).rows as Tenant[];

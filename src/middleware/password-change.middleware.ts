@@ -26,7 +26,7 @@ export const requirePasswordChange = (req: Request, res: Response, next: NextFun
   }
 
   // Si must_change_password es true, bloquear la petición
-  if (req.user.must_change_password) {
+  if (req.user.must_change_password && !req.user.isImpersonating) {
     res.status(403).json({
       exito: false,
       mensaje: 'Debe cambiar su contraseña antes de continuar',

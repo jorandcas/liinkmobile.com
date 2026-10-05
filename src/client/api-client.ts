@@ -36,7 +36,8 @@ export class ApiClient {
     // Interceptor de request
     this.client.interceptors.request.use(
       (config) => {
-        console.log(`[API Client] Request: ${config.method?.toUpperCase()} ${config.url}`);
+        const route = (config.url || '').replace(/\/\d{10,15}(?:\?.*)?$/, '/:dn');
+        console.log(`[API Client] Request: ${config.method?.toUpperCase()} ${route}`);
         return config;
       },
       (error) => {
@@ -48,7 +49,8 @@ export class ApiClient {
     // Interceptor de response
     this.client.interceptors.response.use(
       (response) => {
-        console.log(`[API Client] Response: ${response.status} ${response.config.url}`);
+        const route = (response.config.url || '').replace(/\/\d{10,15}(?:\?.*)?$/, '/:dn');
+        console.log(`[API Client] Response: ${response.status} ${route}`);
         return response;
       },
       (error) => {
@@ -65,23 +67,23 @@ export class ApiClient {
     if (error.response) {
       // Error de respuesta del servidor
       const status = error.response.status;
-      const message = error.response.data as any;
+      const body = error.response.data as any;
+      const message = body && typeof body === 'object' ? body : {};
 
       console.error('[API Client] Response error:', {
         status,
-        data: message,
-        url: error.config?.url
+        url: (error.config?.url || '').replace(/\/\d{10,15}(?:\?.*)?$/, '/:dn')
       });
 
       throw new ApiError(
         status,
-        message.mensaje || 'Error en la respuesta del servidor',
-        Array.isArray(message.detalles) ? message.detalles : [message]
+        'Error en la respuesta de Movistar',
+        Array.isArray(message.detalles) ? message.detalles.map(String) : []
       );
     } else if (error.request) {
       // Error sin respuesta (timeout, network error)
-      console.error('[API Client] No response:', error.message);
-      throw new ApiError(503, 'Servicio no disponible', [error.message]);
+      console.error('[API Client] No response:', error.code || error.message);
+      throw new ApiError(503, 'Servicio de Movistar no disponible', [error.code || error.message]);
     } else {
       // Error de configuración
       console.error('[API Client] Config error:', error.message);

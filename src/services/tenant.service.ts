@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { encryptApiKey, decryptApiKey } from '../utils/encryption.util';
 import { logAction } from './audit.service';
+import { TenantApiStatus } from '../types/distribuidor.types';
 
 /**
  * Servicio para gestión de tenants (distribuidores)
@@ -24,7 +25,7 @@ const superAdminPool = new Pool({
  * Usa el endpoint real: http://94.74.77.50:8010/api/v1/distribuidores/enrolamiento/{dn}
  */
 async function validateApiKey(apiKey: string): Promise<{
-  valid: boolean;
+  status: TenantApiStatus;
   error?: string;
 }> {
   try {
@@ -44,37 +45,39 @@ async function validateApiKey(apiKey: string): Promise<{
     // Verificar que la respuesta tenga el formato esperado
     // La respuesta exitosa es: { success: true, data: { dn: "...", enrolado: false } }
     if (response.data.success === true && response.data.data && response.data.data.dn) {
-      return { valid: true };
+      return { status: 'valida' };
     } else {
       return {
-        valid: false,
-        error: 'API Key devolvió respuesta inválida'
+        status: 'no_disponible',
+        error: 'La API respondió con un formato no esperado.'
       };
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      if (error.response) {
-        // El servidor respondió con un status code diferente de 2xx
+      if (error.response?.status === 401 || error.response?.status === 403) {
         return {
-          valid: false,
-          error: `API Key inválida. Status: ${error.response.status}`
+          status: 'invalida',
+          error: `Movistar rechazó la API key (HTTP ${error.response.status}).`
+        };
+      } else if (error.response) {
+        return {
+          status: 'no_disponible',
+          error: `La API de Movistar respondió con HTTP ${error.response.status}.`
         };
       } else if (error.request) {
-        // La request fue hecha pero no se recibió respuesta
         return {
-          valid: false,
-          error: 'No se pudo conectar al endpoint de DN. Verifica tu conexión.'
+          status: 'no_disponible',
+          error: `No se pudo conectar con la API de Movistar (${error.code || 'ERROR_RED'}).`
         };
       } else {
-        // Error al configurar la request
         return {
-          valid: false,
+          status: 'no_disponible',
           error: `Error: ${error.message}`
         };
       }
     }
     return {
-      valid: false,
+      status: 'no_disponible',
       error: error instanceof Error ? error.message : 'Error desconocido'
     };
   }
@@ -177,15 +180,15 @@ export async function createTenant(
     console.log(`[TenantService] Validando API Key para tenant '${nombre}'...`);
     const validation = await validateApiKey(apiKey);
 
-    if (!validation.valid) {
+    if (validation.status === 'invalida') {
       await client.query('ROLLBACK');
       return {
         success: false,
-        error: `API Key inválida: ${validation.error}`
+        error: validation.error || 'Movistar rechazó la API key.'
       };
     }
 
-    console.log(`[TenantService] API Key válida para tenant '${nombre}'`);
+    console.log(`[TenantService] Estado inicial de API para tenant '${nombre}': ${validation.status}`);
 
     // Generar nombre de base de datos
     const bdName = `tenant_${nombre.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
@@ -230,8 +233,8 @@ export async function createTenant(
     try {
       result = await client.query(
         `INSERT INTO tenants
-          (nombre, email, password_hash, bd_name, api_key_encrypted, api_status, role, tenant_status, must_change_password)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          (nombre, email, password_hash, bd_name, api_key_encrypted, api_status, api_status_checked_at, api_status_error, role, tenant_status, must_change_password)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, $10)
          RETURNING
            id,
            nombre,
@@ -248,7 +251,8 @@ export async function createTenant(
           passwordHash,
           bdName,
           encryptedApiKey,
-          'valida',
+          validation.status,
+          validation.error || null,
           'tenant_admin', // role: tenant_admin
           'activo', // tenant_status: activo
           false // NO debe cambiar contraseña al primer login
@@ -326,6 +330,8 @@ export async function getAllTenants(): Promise<{
         email,
         bd_name,
         api_status,
+        api_status_checked_at,
+        api_status_error,
         tenant_status,
         role,
         must_change_password,
@@ -349,6 +355,89 @@ export async function getAllTenants(): Promise<{
     return {
       success: false,
       error: 'Error al obtener tenants'
+    };
+  }
+}
+
+export async function getTenantForAdminAccess(tenantId: number): Promise<{
+  id: number;
+  nombre: string;
+  email: string;
+} | null> {
+  const result = await superAdminPool.query(
+    `SELECT id, nombre, email
+     FROM tenants
+     WHERE id = $1 AND role = 'tenant_admin' AND tenant_status = 'activo'`,
+    [tenantId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function updateTenant(
+  tenantId: number,
+  nombre: string,
+  email: string,
+  apiKey?: string,
+  adminId?: number,
+  adminEmail?: string,
+  ipAddress?: string
+): Promise<{ success: boolean; tenant?: any; error?: string }> {
+  try {
+    const existing = await superAdminPool.query(
+      `SELECT id, nombre, email FROM tenants WHERE id = $1 AND role = 'tenant_admin'`,
+      [tenantId]
+    );
+    if (!existing.rowCount) return { success: false, error: 'Cliente no encontrado' };
+
+    const normalizedEmail = email.toLowerCase();
+    const duplicate = await superAdminPool.query(
+      `SELECT id FROM tenants WHERE (lower(nombre) = lower($1) OR lower(email) = lower($2)) AND id <> $3`,
+      [nombre, normalizedEmail, tenantId]
+    );
+    if (duplicate.rowCount) return { success: false, error: 'El nombre o correo ya pertenece a otro cliente' };
+
+    const apiKeyChanged = Boolean(apiKey);
+    let apiStatus: TenantApiStatus | null = null;
+    let apiStatusError: string | null = null;
+    let encryptedApiKey: string | null = null;
+    if (apiKeyChanged && apiKey) {
+      const validation = await validateApiKey(apiKey);
+      if (validation.status === 'invalida') {
+        return { success: false, error: validation.error || 'Movistar rechazó la API key.' };
+      }
+      apiStatus = validation.status;
+      apiStatusError = validation.error || null;
+      encryptedApiKey = encryptApiKey(apiKey);
+    }
+
+    const result = await superAdminPool.query(
+      `UPDATE tenants
+       SET nombre = $2,
+           email = $3,
+           api_key_encrypted = COALESCE($4, api_key_encrypted),
+           api_status = COALESCE($5, api_status),
+           api_status_checked_at = CASE WHEN $4 IS NOT NULL THEN NOW() ELSE api_status_checked_at END,
+           api_status_error = CASE WHEN $4 IS NOT NULL THEN $6 ELSE api_status_error END,
+           updated_at = NOW()
+       WHERE id = $1
+       RETURNING id, nombre, email, api_status, api_status_checked_at, api_status_error, tenant_status`,
+      [tenantId, nombre, normalizedEmail, encryptedApiKey, apiStatus, apiStatusError]
+    );
+
+    await logAction(adminId ?? null, adminEmail || 'superadmin', 'tenant_updated', {
+      tenantId,
+      nombreChanged: existing.rows[0].nombre !== nombre,
+      emailChanged: existing.rows[0].email !== normalizedEmail,
+      apiKeyChanged,
+      apiStatus: apiStatus || undefined
+    }, ipAddress);
+
+    return { success: true, tenant: result.rows[0] };
+  } catch (error) {
+    console.error('[TenantService] Error actualizando cliente:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'No se pudo actualizar el cliente'
     };
   }
 }

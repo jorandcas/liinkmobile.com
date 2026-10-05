@@ -49,6 +49,8 @@ export interface ResultadoValidacion {
   exitoso: boolean;
   datos?: DistribuidorResponse;
   error?: string;
+  codigoError?: string;
+  detallesError?: string[];
   origen: 'QA' | 'PROD';
 }
 
@@ -89,3 +91,5 @@ export class ApiError extends Error {
     this.name = 'ApiError';
   }
 }
+
+export type TenantApiStatus = 'pendiente' | 'valida' | 'invalida' | 'no_disponible';

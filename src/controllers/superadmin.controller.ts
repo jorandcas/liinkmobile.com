@@ -5,10 +5,14 @@ import {
   getAllTenants,
   suspendTenant,
   activateTenant,
-  getTenantApiKey
+  getTenantApiKey,
+  getTenantForAdminAccess,
+  updateTenant
 } from '../services/tenant.service';
-import { getAllAuditLogs, getAuditStats } from '../services/audit.service';
+import { getAllAuditLogs, getAuditStats, logAction } from '../services/audit.service';
 import { maskApiKey } from '../utils/encryption.util';
+import jwt from 'jsonwebtoken';
+import { checkTenantApiStatus, getApiStatusSchedule } from '../services/api-status.service';
 
 /**
  * Schema de validación para crear tenant
@@ -20,10 +24,122 @@ const createTenantSchema = z.object({
   apiKey: z.string().min(1, 'La API Key es requerida')
 });
 
+const updateTenantSchema = z.object({
+  nombre: z.string().min(1).max(100),
+  email: z.string().email(),
+  apiKey: z.string().optional()
+});
+
 /**
  * Controlador para SuperAdmin
  */
 export class SuperAdminController {
+  static getApiStatusSchedule(_req: Request, res: Response): void {
+    res.json({ exito: true, schedule: getApiStatusSchedule() });
+  }
+
+  static async updateTenant(req: Request, res: Response): Promise<void> {
+    const tenantId = Number(req.params.id);
+    if (!req.user || !Number.isInteger(tenantId) || tenantId < 1) {
+      res.status(400).json({ exito: false, mensaje: 'ID de cliente inválido' });
+      return;
+    }
+    try {
+      const body = updateTenantSchema.parse(req.body);
+      const result = await updateTenant(
+        tenantId,
+        body.nombre,
+        body.email,
+        body.apiKey || undefined,
+        req.user.id,
+        req.user.email,
+        req.ip
+      );
+      if (!result.success) {
+        res.status(400).json({ exito: false, mensaje: result.error || 'No se pudo actualizar el cliente' });
+        return;
+      }
+      res.json({ exito: true, tenant: result.tenant, mensaje: 'Cliente actualizado' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ exito: false, mensaje: error.errors[0]?.message || 'Datos inválidos' });
+        return;
+      }
+      console.error('[SuperAdminController] Error actualizando cliente:', error);
+      res.status(500).json({ exito: false, mensaje: 'No se pudo actualizar el cliente' });
+    }
+  }
+
+  static async checkTenantApi(req: Request, res: Response): Promise<void> {
+    const tenantId = Number(req.params.id);
+    if (!Number.isInteger(tenantId) || tenantId < 1) {
+      res.status(400).json({ exito: false, mensaje: 'ID de cliente inválido' });
+      return;
+    }
+    try {
+      const result = await checkTenantApiStatus(tenantId);
+      await logAction(req.user!.id, req.user!.email, 'tenant_api_status_checked', {
+        tenantId,
+        status: result.api_status
+      }, req.ip);
+      res.json({ exito: true, api: result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo revisar la API del cliente';
+      const statusCode = message.includes('No se encontró una API key') ? 404 : 500;
+      res.status(statusCode).json({
+        exito: false,
+        mensaje: message
+      });
+    }
+  }
+
+  static async createTenantAccess(req: Request, res: Response): Promise<void> {
+    const tenantId = Number(req.params.id);
+    if (!req.user || !Number.isInteger(tenantId) || tenantId < 1) {
+      res.status(400).json({ exito: false, mensaje: 'ID de cliente inválido' });
+      return;
+    }
+
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      res.status(500).json({ exito: false, mensaje: 'JWT_SECRET no configurado' });
+      return;
+    }
+
+    try {
+      const tenant = await getTenantForAdminAccess(tenantId);
+      if (!tenant) {
+        res.status(404).json({ exito: false, mensaje: 'Cliente no encontrado o inactivo' });
+        return;
+      }
+
+      const token = jwt.sign({
+        userId: tenant.id,
+        email: tenant.email,
+        nombre: tenant.nombre,
+        role: 'tenant_admin',
+        adminAccess: true,
+        adminUserId: req.user.id
+      }, jwtSecret, { expiresIn: 15 * 60 });
+
+      await logAction(req.user.id, req.user.email, 'superadmin_tenant_access', {
+        tenantId: tenant.id,
+        tenantName: tenant.nombre,
+        expiresInMinutes: 15
+      }, req.ip);
+
+      res.json({
+        exito: true,
+        token,
+        tenant: { id: tenant.id, nombre: tenant.nombre },
+        expiresInSeconds: 900
+      });
+    } catch (error) {
+      console.error('[SuperAdminController] Error creando acceso al perfil:', error);
+      res.status(500).json({ exito: false, mensaje: 'No se pudo abrir el perfil del cliente' });
+    }
+  }
+
   /**
    * Crear un nuevo tenant
    */

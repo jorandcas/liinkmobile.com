@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS tenants (
   password_hash VARCHAR(255) NOT NULL,
   bd_name VARCHAR(100) UNIQUE NOT NULL,
   api_key_encrypted TEXT,                    -- NULL para superadmin
-  api_status VARCHAR(20) DEFAULT 'pendiente', -- 'pendiente' | 'valida' | 'invalida'
+  api_status VARCHAR(20) DEFAULT 'pendiente', -- 'pendiente' | 'valida' | 'invalida' | 'no_disponible'
+  api_status_checked_at TIMESTAMPTZ,
+  api_status_error TEXT,
   tenant_status VARCHAR(20) DEFAULT 'activo',  -- 'activo' | 'suspendido'
   role VARCHAR(20) DEFAULT 'tenant_admin',     -- 'superadmin' | 'tenant_admin'
   must_change_password BOOLEAN DEFAULT true,   -- Cambio obligatorio al primer login
@@ -62,7 +64,7 @@ CREATE TRIGGER update_tenants_updated_at
 -- ============================================
 COMMENT ON TABLE tenants IS 'Tabla de tenants y superadmin';
 COMMENT ON COLUMN tenants.api_key_encrypted IS 'API Key cifrada con AES-256-GCM (NULL para superadmin)';
-COMMENT ON COLUMN tenants.api_status IS 'Estado de validación de la API Key: pendiente | valida | invalida';
+COMMENT ON COLUMN tenants.api_status IS 'Estado operativo de la API: pendiente | valida | invalida | no_disponible';
 COMMENT ON COLUMN tenants.tenant_status IS 'Estado del tenant: activo | suspendido';
 COMMENT ON COLUMN tenants.role IS 'Rol del usuario: superadmin | tenant_admin';
 COMMENT ON COLUMN tenants.must_change_password IS 'Indica si el usuario debe cambiar su contraseña al primer login';

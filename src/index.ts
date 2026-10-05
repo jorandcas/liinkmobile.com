@@ -9,6 +9,7 @@ import { createCampanaRouter } from './routes/campana.routes';
 import { createConfigRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { bootstrapDatabases } from './db/bootstrap';
+import { startApiStatusMonitor } from './services/api-status.service';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -114,12 +115,12 @@ async function startServer(): Promise<void> {
     console.log('=================================');
     console.log('');
 
-    // Verificar API Key
+    // Las claves de validación se obtienen por tenant; API_KEY solo es compatibilidad legacy.
     if (!process.env.API_KEY) {
-      console.warn('⚠️  ADVERTENCIA: API_KEY no configurada en variables de entorno');
-      console.warn('⚠️  Las requests fallarán sin la API Key');
-      console.log('');
+      console.log('[API] Sin API_KEY global; se usarán las API keys guardadas por cliente.');
     }
+
+    startApiStatusMonitor();
   });
 }
 

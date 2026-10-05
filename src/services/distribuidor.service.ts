@@ -1,4 +1,5 @@
 import { ApiClient } from '../client/api-client';
+import { ApiError } from '../types/distribuidor.types';
 import { API_CONFIG, getEndpointByEnvironment } from '../config/endpoints.config';
 import { Pool } from 'pg';
 import {
@@ -78,7 +79,13 @@ export class DistribuidorService {
       const resultadoError = {
         telefono,
         exitoso: false,
-        error: error instanceof Error ? error.message : 'Error desconocido',
+        error: error instanceof ApiError
+          ? error.statusCode >= 500
+            ? `${error.message}${error.detalles?.[0] ? ` (${error.detalles[0]})` : ''}`
+            : `Movistar respondió HTTP ${error.statusCode}: ${error.message}`
+          : error instanceof Error ? error.message : 'Error desconocido',
+        codigoError: error instanceof ApiError ? `HTTP_${error.statusCode}` : 'ERROR_INTERNO',
+        detallesError: error instanceof ApiError ? error.detalles : undefined,
         origen: ambiente
       };
 

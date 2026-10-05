@@ -56,7 +56,7 @@ test('bulk validation displays live progress and timing details', () => {
   assert.match(dashboard, /function renderBulkProgress\(\)/);
   assert.match(dashboard, /setInterval\(renderBulkProgress, 1000\)/);
   assert.match(dashboard, /showProgressBar\(cantidadNumeros\)/);
-  assert.match(dashboardHtml, /dashboard\.js\?v=17/);
+  assert.match(dashboardHtml, /dashboard\.js\?v=18/);
 });
 
 test('bulk validation prevents duplicate jobs and flushes progress events', () => {
